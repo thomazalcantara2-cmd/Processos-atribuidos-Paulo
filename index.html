@@ -192,8 +192,14 @@
     vertical-align: top;
   }
 
-  tbody tr:hover { background: #f9fbfd; }
+  tbody tr:nth-child(even) { background: #f5f8fb; }
+  tbody tr:hover { background: #e8f0fb; }
   tbody tr:last-child td { border-bottom: none; }
+
+  .type-text {
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
 
   .empty-row td {
     text-align: center;
@@ -799,9 +805,9 @@
       var statusColor = STATUS_COLORS[r.status] || "#475569";
       return (
         '<tr>' +
-        '<td>' + escapeHtml(r.natureza) + '</td>' +
+        '<td><span class="type-text">' + escapeHtml(r.natureza) + '</span></td>' +
         '<td>' + escapeHtml(r.numeroProcesso) + '</td>' +
-        '<td><span class="status-text" style="color:' + statusColor + '">' + escapeHtml(r.status) + '</span></td>' +
+        '<td><span class="type-text status-text" style="color:' + statusColor + '">' + escapeHtml(r.status) + '</span></td>' +
         '<td>' + formatDate(r.distribuicao) + '</td>' +
         '<td>' + escapeHtml(r.assunto) + '</td>' +
         '<td>' + formatDate(r.dataRetorno) + '</td>' +
