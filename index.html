@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Processos Atribuídos</title>
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --border: #dde3ea;
+    --text: #1c2733;
+    --text-muted: #64748b;
+    --primary: #1e3a5f;
+    --primary-dark: #16293f;
+    --accent: #2563eb;
+    --danger: #dc2626;
+    --danger-dark: #b91c1c;
+    --success: #16a34a;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header.topbar {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  header.topbar h1 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+
+  header.topbar .subtitle {
+    margin: 2px 0 0;
+    font-size: 0.82rem;
+    color: #c9d6e6;
+  }
+
+  .topbar-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: filter 0.15s ease, transform 0.05s ease;
+  }
+  .btn:active { transform: translateY(1px); }
+
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.08); }
+
+  .btn-ghost { background: rgba(255,255,255,0.12); color: #fff; }
+  .btn-ghost:hover { background: rgba(255,255,255,0.2); }
+
+  .btn-secondary { background: #eef1f5; color: var(--text); }
+  .btn-secondary:hover { background: #e2e7ed; }
+
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { background: var(--danger-dark); }
+
+  .btn-small { padding: 6px 10px; font-size: 0.78rem; border-radius: 6px; }
+
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 22px 28px 60px;
+  }
+
+  .status-banner {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: #fff7e6;
+    border: 1px solid #f3d99b;
+    color: #8a5a00;
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+  }
+  .status-banner.show { display: flex; }
+  .status-banner.error { background: #fef2f2; border-color: #f3b3b3; color: #9b1c1c; }
+
+  .summary-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 18px;
+    min-width: 140px;
+    box-shadow: var(--shadow);
+  }
+  .summary-card .num { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+  .summary-card .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+
+  .toolbar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .toolbar input[type="text"],
+  .toolbar select {
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    background: #fbfcfd;
+    color: var(--text);
+  }
+
+  .toolbar input[type="text"] { min-width: 220px; flex: 1; }
+
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    min-width: 1100px;
+  }
+
+  thead th {
+    text-align: left;
+    background: #f8fafc;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    position: sticky;
+    top: 0;
+  }
+  thead th:hover { color: var(--text); }
+  thead th .sort-arrow { font-size: 0.65rem; margin-left: 4px; opacity: 0.6; }
+
+  tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  tbody tr:hover { background: #f9fbfd; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .empty-row td {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px 14px;
+    font-size: 0.9rem;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .badge-natureza {
+    background: #eef2ff;
+    color: #4338ca;
+  }
+
+  .row-actions { display: flex; gap: 6px; white-space: nowrap; }
+
+  .icon-btn {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .icon-btn:hover { background: #f1f5f9; }
+  .icon-btn.danger:hover { background: #fef2f2; border-color: #f3b3b3; }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    overflow-y: auto;
+    z-index: 100;
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: #fff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 640px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  }
+
+  .modal-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-header h2 { margin: 0; font-size: 1.05rem; }
+  .modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text-muted); line-height: 1; }
+
+  .modal-body { padding: 20px 22px; }
+  .modal-footer {
+    padding: 16px 22px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+  }
+  .form-grid .full { grid-column: 1 / -1; }
+
+  .field label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+  }
+
+  .field select,
+  .field input[type="text"],
+  .field input[type="date"] {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-size: 0.88rem;
+    background: #fbfcfd;
+    color: var(--text);
+  }
+
+  .field select:focus,
+  .field input:focus { outline: 2px solid #bcd2f5; border-color: var(--accent); }
+
+  .assunto-add-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .assunto-add-row input { flex: 1; }
+  .assunto-add-row.hidden { display: none; }
+
+  .link-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+
+  footer.page-footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    padding: 24px 0 8px;
+  }
+
+  @media (max-width: 640px) {
+    header.topbar { padding: 16px; }
+    main { padding: 16px; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>Processos Atribuídos</h1>
+    <p class="subtitle" id="connectionSubtitle">Modo local — configure a integração com o Google Sheets</p>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-ghost" id="btnSettings" type="button">⚙️ Configurar planilha</button>
+    <button class="btn btn-ghost" id="btnExport" type="button">⬇️ Exportar CSV</button>
+    <button class="btn btn-primary" id="btnNew" type="button">+ Novo processo</button>
+  </div>
+</header>
+
+<main>
+  <div class="status-banner" id="statusBanner"></div>
+
+  <div class="summary-row" id="summaryRow"></div>
+
+  <div class="toolbar">
+    <input type="text" id="filterText" placeholder="Buscar por nº do processo ou assunto...">
+    <select id="filterNatureza">
+      <option value="">Natureza (todas)</option>
+    </select>
+    <select id="filterStatus">
+      <option value="">Status (todos)</option>
+    </select>
+    <button class="btn btn-secondary btn-small" id="btnClearFilters" type="button">Limpar filtros</button>
+    <button class="btn btn-secondary btn-small" id="btnRefresh" type="button">↻ Atualizar</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th data-sort="natureza">Natureza</th>
+          <th data-sort="numeroProcesso">Nº Processo</th>
+          <th data-sort="status">Status</th>
+          <th data-sort="distribuicao">Distribuição</th>
+          <th data-sort="assunto">Assunto</th>
+          <th data-sort="dataRetorno">Data do retorno</th>
+          <th data-sort="elaborarVoto">Elaborar o voto</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr class="empty-row"><td colspan="8">Carregando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="page-footer">Processos Atribuídos &middot; dados salvos em planilha do Google via Apps Script</footer>
+</main>
+
+<!-- Modal: novo/editar processo -->
+<div class="modal-overlay" id="formModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="formModalTitle">Novo processo</h2>
+      <button class="modal-close" id="formModalClose" type="button">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="processForm">
+        <input type="hidden" id="recordId">
+        <div class="form-grid">
+          <div class="field">
+            <label for="fNatureza">1 — Natureza</label>
+            <select id="fNatureza" required>
+              <option value="">Selecione...</option>
+              <option value="AI">AI</option>
+              <option value="RemNecCiv">RemNecCiv</option>
+              <option value="ApCiv">ApCiv</option>
+              <option value="ApelRemNec">ApelRemNec</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fNumeroProcesso">2 — Nº Processo</label>
+            <input type="text" id="fNumeroProcesso" placeholder="0000000-00.0000.0.00.0000" required>
+          </div>
+          <div class="field full">
+            <label for="fStatus">3 — Status</label>
+            <select id="fStatus" required>
+              <option value="">Selecione...</option>
+              <option>A SER ELABORADO</option>
+              <option>EM ELABORAÇÃO</option>
+              <option>ENCAMINHADA PARA CORREÇÃO</option>
+              <option>ENCAMINHADA PARA ASSINATURA</option>
+              <option>ENCAMINHADA PARA CORREÇÃO + Minuta CORRIGIR</option>
+              <option>Minuta Pronta- Aguardando Fechamento de Pauta</option>
+              <option>Minuta PRONTA - apto para inclusão em pauta</option>
+              <option>Minuta PRONTA - aguardando julgamento</option>
+              <option>ASSINADA</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fDistribuicao">4 — Distribuição</label>
+            <input type="date" id="fDistribuicao">
+          </div>
+          <div class="field">
+            <label for="fDataRetorno">6 — Data do retorno</label>
+            <input type="date" id="fDataRetorno">
+          </div>
+          <div class="field full">
+            <label for="fAssunto">5 — Assunto</label>
+            <select id="fAssunto" required></select>
+            <button type="button" class="link-btn" id="btnToggleNewAssunto">+ Adicionar novo assunto</button>
+            <div class="assunto-add-row hidden" id="newAssuntoRow">
+              <input type="text" id="fNewAssunto" placeholder="Digite o novo assunto...">
+              <button type="button" class="btn btn-secondary btn-small" id="btnAddAssunto">Adicionar</button>
+            </div>
+          </div>
+          <div class="field full">
+            <label for="fElaborarVoto">7 — Elaborar o voto</label>
+            <select id="fElaborarVoto" required>
+              <option value="">Selecione...</option>
+              <option>A SER ELABORADO</option>
+              <option>EM ELABORAÇÃO</option>
+              <option>ELABORADO</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btnCancelForm" type="button">Cancelar</button>
+      <button class="btn btn-primary" id="btnSaveForm" type="button">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: configurações -->
+<div class="modal-overlay" id="settingsModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Integração com Google Sheets</h2>
+      <button class="modal-close" id="settingsModalClose" type="button">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="field full">
+        <label for="scriptUrlInput">URL do Web App (Apps Script)</label>
+        <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+      </div>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-top:10px; line-height:1.5;">
+        Cole aqui a URL gerada ao publicar o script <code>apps-script/Code.gs</code> como aplicativo da Web
+        (implantação com acesso "Qualquer pessoa"). Veja o passo a passo no arquivo
+        <code>README.md</code> do repositório. Enquanto a URL não for configurada, os dados ficam salvos
+        apenas neste navegador.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btnClearUrl" type="button">Remover integração</button>
+      <button class="btn btn-primary" id="btnSaveUrl" type="button">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "processos_cache_v1";
+  var CUSTOM_ASSUNTOS_KEY = "processos_custom_assuntos_v1";
+  var SCRIPT_URL_KEY = "processos_script_url_v1";
+
+  var ASSUNTOS_PADRAO = [
+    "ACP nº 0005019-15.1997.4.03.6000 - reajuste 28,86%",
+    "Acidente de Trânsito",
+    "Acumulação de Proventos",
+    "Anuidades OAB",
+    "Aposentadoria por Tempo de Contribuição",
+    "Aposentadoria por tempo de contribuição pela regra de transição 2 - pedágio mínimo.",
+    "Atraso entrega de obra CEF",
+    "Atraso entrega de obra CEF (Programa Minha Casa, Minha Vida)",
+    "Ausência de Legitimidade para a Causa",
+    "Classificação e/ou Preterição",
+    "Concurso Público",
+    "EXECUÇÃO FISCAL - PJ requer transferência de valores bloqueados para amortização do parcelamento do débito executado pela Fazenda",
+    "Extinção da Execução",
+    "FIES",
+    "Financiamento do SUS - hiperbárica",
+    "IRPJ/Imposto de Renda de Pessoa Jurídica",
+    "Internação compulsória - hanseníase",
+    "MS - Exportação/Vedações",
+    "MS - Incidência sobre Lucro",
+    "MS - Inscrição em dívida ativa",
+    "MS - Suspensão Aposentadoria por Tempo de Contribuição",
+    "MS - apreciação do requerimento administrativo da parte impetrante",
+    "Pedido administrativo de concessão de benefício",
+    "Recurso Administrativo",
+    "Repasse de Verbas Públicas (10957)",
+    "Restabalecimento de benefício"
+  ];
+
+  var STATUS_COLORS = {
+    "A SER ELABORADO": "#f1f5f9;color:#475569",
+    "EM ELABORAÇÃO": "#dbeafe;color:#1d4ed8",
+    "ENCAMINHADA PARA CORREÇÃO": "#ffedd5;color:#c2410c",
+    "ENCAMINHADA PARA ASSINATURA": "#ede9fe;color:#6d28d9",
+    "ENCAMINHADA PARA CORREÇÃO + Minuta CORRIGIR": "#fee2e2;color:#b91c1c",
+    "Minuta Pronta- Aguardando Fechamento de Pauta": "#ccfbf1;color:#0f766e",
+    "Minuta PRONTA - apto para inclusão em pauta": "#a7f3d0;color:#047857",
+    "Minuta PRONTA - aguardando julgamento": "#e0e7ff;color:#4338ca",
+    "ASSINADA": "#dcfce7;color:#15803d"
+  };
+
+  var state = {
+    records: [],
+    sortField: "distribuicao",
+    sortDir: "desc",
+    editingId: null
+  };
+
+  function $(id) { return document.getElementById(id); }
+
+  function getScriptUrl() {
+    return localStorage.getItem(SCRIPT_URL_KEY) || "";
+  }
+
+  function getCustomAssuntos() {
+    try {
+      return JSON.parse(localStorage.getItem(CUSTOM_ASSUNTOS_KEY) || "[]");
+    } catch (e) { return []; }
+  }
+
+  function saveCustomAssunto(value) {
+    var list = getCustomAssuntos();
+    if (list.indexOf(value) === -1) {
+      list.push(value);
+      localStorage.setItem(CUSTOM_ASSUNTOS_KEY, JSON.stringify(list));
+    }
+  }
+
+  function allAssuntos() {
+    var fromRecords = state.records.map(function (r) { return r.assunto; }).filter(Boolean);
+    var combined = ASSUNTOS_PADRAO.concat(getCustomAssuntos()).concat(fromRecords);
+    var seen = {};
+    var out = [];
+    combined.forEach(function (a) {
+      if (a && !seen[a]) { seen[a] = true; out.push(a); }
+    });
+    return out;
+  }
+
+  function loadLocalCache() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    } catch (e) { return []; }
+  }
+
+  function saveLocalCache(records) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  }
+
+  function uid() {
+    return "id_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+  }
+
+  function showBanner(message, isError) {
+    var el = $("statusBanner");
+    if (!message) { el.classList.remove("show", "error"); return; }
+    el.textContent = message;
+    el.classList.add("show");
+    el.classList.toggle("error", !!isError);
+  }
+
+  function updateConnectionSubtitle() {
+    var url = getScriptUrl();
+    var sub = $("connectionSubtitle");
+    if (url) {
+      sub.textContent = "Conectado à planilha do Google Sheets";
+    } else {
+      sub.textContent = "Modo local — configure a integração com o Google Sheets";
+    }
+  }
+
+  // ---------- Backend communication ----------
+
+  function apiList() {
+    var url = getScriptUrl();
+    if (!url) {
+      return Promise.resolve(loadLocalCache());
+    }
+    return fetch(url + (url.indexOf("?") === -1 ? "?" : "&") + "action=list")
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.error || "Falha ao carregar dados");
+        var records = (res.data || []).map(mapSheetRowToRecord);
+        saveLocalCache(records);
+        showBanner("", false);
+        return records;
+      })
+      .catch(function (err) {
+        showBanner("Não foi possível conectar à planilha (" + err.message + "). Exibindo dados salvos localmente.", true);
+        return loadLocalCache();
+      });
+  }
+
+  function mapSheetRowToRecord(row) {
+    return {
+      id: row.ID,
+      natureza: row.Natureza || "",
+      numeroProcesso: row.NumeroProcesso || "",
+      status: row.Status || "",
+      distribuicao: row.Distribuicao || "",
+      assunto: row.Assunto || "",
+      dataRetorno: row.DataRetorno || "",
+      elaborarVoto: row.ElaborarVoto || ""
+    };
+  }
+
+  function recordToSheetFields(record) {
+    return {
+      Natureza: record.natureza,
+      NumeroProcesso: record.numeroProcesso,
+      Status: record.status,
+      Distribuicao: record.distribuicao,
+      Assunto: record.assunto,
+      DataRetorno: record.dataRetorno,
+      ElaborarVoto: record.elaborarVoto
+    };
+  }
+
+  function apiSend(payload) {
+    var url = getScriptUrl();
+    if (!url) return Promise.resolve({ ok: true, local: true });
+    return fetch(url, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    }).then(function (r) { return r.json(); });
+  }
+
+  function createRecord(record) {
+    var url = getScriptUrl();
+    if (!url) {
+      record.id = uid();
+      var records = loadLocalCache();
+      records.push(record);
+      saveLocalCache(records);
+      return Promise.resolve(record);
+    }
+    return apiSend({ action: "create", record: recordToSheetFields(record) })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.error || "Falha ao salvar");
+        record.id = res.id;
+        return record;
+      });
+  }
+
+  function updateRecord(record) {
+    var url = getScriptUrl();
+    if (!url) {
+      var records = loadLocalCache().map(function (r) {
+        return r.id === record.id ? record : r;
+      });
+      saveLocalCache(records);
+      return Promise.resolve(record);
+    }
+    return apiSend({ action: "update", id: record.id, record: recordToSheetFields(record) })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.error || "Falha ao atualizar");
+        return record;
+      });
+  }
+
+  function deleteRecord(id) {
+    var url = getScriptUrl();
+    if (!url) {
+      var records = loadLocalCache().filter(function (r) { return r.id !== id; });
+      saveLocalCache(records);
+      return Promise.resolve();
+    }
+    return apiSend({ action: "delete", id: id })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.error || "Falha ao excluir");
+      });
+  }
+
+  // ---------- Rendering ----------
+
+  function formatDate(iso) {
+    if (!iso) return "—";
+    var d = String(iso).slice(0, 10);
+    var parts = d.split("-");
+    if (parts.length !== 3) return d;
+    return parts[2] + "/" + parts[1] + "/" + parts[0];
+  }
+
+  function renderSummary() {
+    var total = state.records.length;
+    var counts = {};
+    state.records.forEach(function (r) {
+      counts[r.status] = (counts[r.status] || 0) + 1;
+    });
+    var assinadas = counts["ASSINADA"] || 0;
+    var emElaboracao = (counts["EM ELABORAÇÃO"] || 0) + (counts["A SER ELABORADO"] || 0);
+    var paraCorrigir = (counts["ENCAMINHADA PARA CORREÇÃO"] || 0) + (counts["ENCAMINHADA PARA CORREÇÃO + Minuta CORRIGIR"] || 0);
+
+    var cards = [
+      { label: "Total de processos", num: total },
+      { label: "Em elaboração", num: emElaboracao },
+      { label: "Para correção", num: paraCorrigir },
+      { label: "Assinadas", num: assinadas }
+    ];
+
+    $("summaryRow").innerHTML = cards.map(function (c) {
+      return '<div class="summary-card"><div class="num">' + c.num + '</div><div class="label">' + c.label + '</div></div>';
+    }).join("");
+  }
+
+  function populateFilterOptions() {
+    var statuses = Object.keys(STATUS_COLORS);
+    var statusSelect = $("filterStatus");
+    var currentStatus = statusSelect.value;
+    statusSelect.innerHTML = '<option value="">Status (todos)</option>' +
+      statuses.map(function (s) { return '<option value="' + escapeHtml(s) + '">' + escapeHtml(s) + '</option>'; }).join("");
+    statusSelect.value = currentStatus;
+
+    var naturezas = ["AI", "RemNecCiv", "ApCiv", "ApelRemNec"];
+    var naturezaSelect = $("filterNatureza");
+    var currentNatureza = naturezaSelect.value;
+    naturezaSelect.innerHTML = '<option value="">Natureza (todas)</option>' +
+      naturezas.map(function (n) { return '<option value="' + n + '">' + n + '</option>'; }).join("");
+    naturezaSelect.value = currentNatureza;
+  }
+
+  function escapeHtml(str) {
+    return String(str || "").replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function getFilteredSortedRecords() {
+    var text = $("filterText").value.trim().toLowerCase();
+    var natureza = $("filterNatureza").value;
+    var status = $("filterStatus").value;
+
+    var filtered = state.records.filter(function (r) {
+      if (natureza && r.natureza !== natureza) return false;
+      if (status && r.status !== status) return false;
+      if (text) {
+        var haystack = (r.numeroProcesso + " " + r.assunto).toLowerCase();
+        if (haystack.indexOf(text) === -1) return false;
+      }
+      return true;
+    });
+
+    var field = state.sortField;
+    var dir = state.sortDir === "asc" ? 1 : -1;
+    filtered.sort(function (a, b) {
+      var av = (a[field] || "").toString();
+      var bv = (b[field] || "").toString();
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+
+    return filtered;
+  }
+
+  function renderTable() {
+    var records = getFilteredSortedRecords();
+    var body = $("tableBody");
+
+    if (records.length === 0) {
+      body.innerHTML = '<tr class="empty-row"><td colspan="8">Nenhum processo cadastrado. Clique em "+ Novo processo" para começar.</td></tr>';
+      return;
+    }
+
+    body.innerHTML = records.map(function (r) {
+      var statusStyle = STATUS_COLORS[r.status] || "#f1f5f9;color:#475569";
+      return (
+        '<tr>' +
+        '<td><span class="badge badge-natureza">' + escapeHtml(r.natureza) + '</span></td>' +
+        '<td>' + escapeHtml(r.numeroProcesso) + '</td>' +
+        '<td><span class="badge" style="background:' + statusStyle.split(";")[0] + ';color:' + statusStyle.split(";")[1].replace("color:", "") + '">' + escapeHtml(r.status) + '</span></td>' +
+        '<td>' + formatDate(r.distribuicao) + '</td>' +
+        '<td>' + escapeHtml(r.assunto) + '</td>' +
+        '<td>' + formatDate(r.dataRetorno) + '</td>' +
+        '<td>' + escapeHtml(r.elaborarVoto) + '</td>' +
+        '<td><div class="row-actions">' +
+        '<button class="icon-btn" title="Editar" data-action="edit" data-id="' + escapeHtml(r.id) + '">✎</button>' +
+        '<button class="icon-btn danger" title="Excluir" data-action="delete" data-id="' + escapeHtml(r.id) + '">🗑</button>' +
+        '</div></td>' +
+        '</tr>'
+      );
+    }).join("");
+  }
+
+  function updateSortArrows() {
+    document.querySelectorAll("thead th[data-sort]").forEach(function (th) {
+      var field = th.getAttribute("data-sort");
+      var label = th.textContent.replace(/[▲▼]/g, "").trim();
+      if (field === state.sortField) {
+        th.textContent = label + (state.sortDir === "asc" ? " ▲" : " ▼");
+      } else {
+        th.textContent = label;
+      }
+    });
+  }
+
+  function renderAll() {
+    renderSummary();
+    populateFilterOptions();
+    renderTable();
+    updateSortArrows();
+    updateConnectionSubtitle();
+  }
+
+  function refresh() {
+    $("tableBody").innerHTML = '<tr class="empty-row"><td colspan="8">Carregando...</td></tr>';
+    apiList().then(function (records) {
+      state.records = records;
+      renderAll();
+    });
+  }
+
+  // ---------- Form modal ----------
+
+  function populateAssuntoSelect(selected) {
+    var select = $("fAssunto");
+    var options = allAssuntos();
+    select.innerHTML = '<option value="">Selecione...</option>' +
+      options.map(function (a) {
+        return '<option value="' + escapeHtml(a) + '"' + (a === selected ? " selected" : "") + '>' + escapeHtml(a) + '</option>';
+      }).join("");
+  }
+
+  function openFormModal(record) {
+    state.editingId = record ? record.id : null;
+    $("formModalTitle").textContent = record ? "Editar processo" : "Novo processo";
+    $("recordId").value = record ? record.id : "";
+    $("fNatureza").value = record ? record.natureza : "";
+    $("fNumeroProcesso").value = record ? record.numeroProcesso : "";
+    $("fStatus").value = record ? record.status : "";
+    $("fDistribuicao").value = record ? (record.distribuicao || "").slice(0, 10) : "";
+    $("fDataRetorno").value = record ? (record.dataRetorno || "").slice(0, 10) : "";
+    $("fElaborarVoto").value = record ? record.elaborarVoto : "";
+    populateAssuntoSelect(record ? record.assunto : "");
+    $("newAssuntoRow").classList.add("hidden");
+    $("fNewAssunto").value = "";
+    $("formModalOverlay").classList.add("show");
+  }
+
+  function closeFormModal() {
+    $("formModalOverlay").classList.remove("show");
+  }
+
+  function collectFormRecord() {
+    return {
+      id: $("recordId").value || null,
+      natureza: $("fNatureza").value,
+      numeroProcesso: $("fNumeroProcesso").value.trim(),
+      status: $("fStatus").value,
+      distribuicao: $("fDistribuicao").value,
+      assunto: $("fAssunto").value,
+      dataRetorno: $("fDataRetorno").value,
+      elaborarVoto: $("fElaborarVoto").value
+    };
+  }
+
+  function validateForm(record) {
+    if (!record.natureza) return "Selecione a Natureza.";
+    if (!record.numeroProcesso) return "Informe o Nº do processo.";
+    if (!record.status) return "Selecione o Status.";
+    if (!record.assunto) return "Selecione o Assunto.";
+    if (!record.elaborarVoto) return "Selecione a situação do voto.";
+    return null;
+  }
+
+  function saveForm() {
+    var record = collectFormRecord();
+    var error = validateForm(record);
+    if (error) {
+      alert(error);
+      return;
+    }
+
+    var btn = $("btnSaveForm");
+    btn.disabled = true;
+    btn.textContent = "Salvando...";
+
+    var action = record.id ? updateRecord(record) : createRecord(record);
+    action.then(function () {
+      closeFormModal();
+      refresh();
+    }).catch(function (err) {
+      alert("Erro ao salvar: " + err.message);
+    }).finally(function () {
+      btn.disabled = false;
+      btn.textContent = "Salvar";
+    });
+  }
+
+  // ---------- Settings modal ----------
+
+  function openSettingsModal() {
+    $("scriptUrlInput").value = getScriptUrl();
+    $("settingsModalOverlay").classList.add("show");
+  }
+
+  function closeSettingsModal() {
+    $("settingsModalOverlay").classList.remove("show");
+  }
+
+  function saveSettings() {
+    var url = $("scriptUrlInput").value.trim();
+    if (url) {
+      localStorage.setItem(SCRIPT_URL_KEY, url);
+    } else {
+      localStorage.removeItem(SCRIPT_URL_KEY);
+    }
+    closeSettingsModal();
+    refresh();
+  }
+
+  function clearSettings() {
+    localStorage.removeItem(SCRIPT_URL_KEY);
+    $("scriptUrlInput").value = "";
+    closeSettingsModal();
+    refresh();
+  }
+
+  // ---------- CSV export ----------
+
+  function exportCsv() {
+    var records = getFilteredSortedRecords();
+    var headers = ["Natureza", "Nº Processo", "Status", "Distribuição", "Assunto", "Data do retorno", "Elaborar o voto"];
+    var lines = [headers.join(";")];
+    records.forEach(function (r) {
+      lines.push([
+        r.natureza, r.numeroProcesso, r.status,
+        formatDate(r.distribuicao), r.assunto,
+        formatDate(r.dataRetorno), r.elaborarVoto
+      ].map(function (v) {
+        var s = String(v || "").replace(/"/g, '""');
+        return '"' + s + '"';
+      }).join(";"));
+    });
+    var blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+    var link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "processos.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  // ---------- Event bindings ----------
+
+  function bindEvents() {
+    $("btnNew").addEventListener("click", function () { openFormModal(null); });
+    $("btnRefresh").addEventListener("click", refresh);
+    $("btnExport").addEventListener("click", exportCsv);
+    $("btnClearFilters").addEventListener("click", function () {
+      $("filterText").value = "";
+      $("filterNatureza").value = "";
+      $("filterStatus").value = "";
+      renderTable();
+    });
+
+    $("filterText").addEventListener("input", renderTable);
+    $("filterNatureza").addEventListener("change", renderTable);
+    $("filterStatus").addEventListener("change", renderTable);
+
+    document.querySelectorAll("thead th[data-sort]").forEach(function (th) {
+      th.addEventListener("click", function () {
+        var field = th.getAttribute("data-sort");
+        if (state.sortField === field) {
+          state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+        } else {
+          state.sortField = field;
+          state.sortDir = "asc";
+        }
+        renderTable();
+        updateSortArrows();
+      });
+    });
+
+    $("tableBody").addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      var id = btn.getAttribute("data-id");
+      var action = btn.getAttribute("data-action");
+      var record = state.records.find(function (r) { return r.id === id; });
+      if (!record) return;
+
+      if (action === "edit") {
+        openFormModal(record);
+      } else if (action === "delete") {
+        if (confirm("Tem certeza que deseja excluir o processo " + record.numeroProcesso + "?")) {
+          deleteRecord(id).then(refresh).catch(function (err) {
+            alert("Erro ao excluir: " + err.message);
+          });
+        }
+      }
+    });
+
+    $("formModalClose").addEventListener("click", closeFormModal);
+    $("btnCancelForm").addEventListener("click", closeFormModal);
+    $("btnSaveForm").addEventListener("click", saveForm);
+    $("formModalOverlay").addEventListener("click", function (e) {
+      if (e.target === $("formModalOverlay")) closeFormModal();
+    });
+
+    $("btnToggleNewAssunto").addEventListener("click", function () {
+      $("newAssuntoRow").classList.toggle("hidden");
+      $("fNewAssunto").focus();
+    });
+
+    $("btnAddAssunto").addEventListener("click", function () {
+      var value = $("fNewAssunto").value.trim();
+      if (!value) return;
+      saveCustomAssunto(value);
+      populateAssuntoSelect(value);
+      $("fNewAssunto").value = "";
+      $("newAssuntoRow").classList.add("hidden");
+    });
+
+    $("btnSettings").addEventListener("click", openSettingsModal);
+    $("settingsModalClose").addEventListener("click", closeSettingsModal);
+    $("btnSaveUrl").addEventListener("click", saveSettings);
+    $("btnClearUrl").addEventListener("click", clearSettings);
+    $("settingsModalOverlay").addEventListener("click", function (e) {
+      if (e.target === $("settingsModalOverlay")) closeSettingsModal();
+    });
+  }
+
+  // ---------- Init ----------
+
+  bindEvents();
+  refresh();
+})();
+</script>
+</body>
+</html>
