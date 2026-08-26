@@ -202,18 +202,10 @@
     font-size: 0.9rem;
   }
 
-  .badge {
-    display: inline-block;
-    padding: 3px 9px;
-    border-radius: 999px;
-    font-size: 0.72rem;
+  .status-text {
     font-weight: 600;
+    font-size: 0.82rem;
     white-space: nowrap;
-  }
-
-  .badge-natureza {
-    background: #eef2ff;
-    color: #4338ca;
   }
 
   .row-actions { display: flex; gap: 6px; white-space: nowrap; }
@@ -529,15 +521,15 @@
   ];
 
   var STATUS_COLORS = {
-    "A SER ELABORADO": "#f1f5f9;color:#475569",
-    "EM ELABORAÇÃO": "#dbeafe;color:#1d4ed8",
-    "ENCAMINHADA PARA CORREÇÃO": "#ffedd5;color:#c2410c",
-    "ENCAMINHADA PARA ASSINATURA": "#ede9fe;color:#6d28d9",
-    "ENCAMINHADA PARA CORREÇÃO + Minuta CORRIGIR": "#fee2e2;color:#b91c1c",
-    "Minuta Pronta- Aguardando Fechamento de Pauta": "#ccfbf1;color:#0f766e",
-    "Minuta PRONTA - apto para inclusão em pauta": "#a7f3d0;color:#047857",
-    "Minuta PRONTA - aguardando julgamento": "#e0e7ff;color:#4338ca",
-    "ASSINADA": "#dcfce7;color:#15803d"
+    "A SER ELABORADO": "#64748b",
+    "EM ELABORAÇÃO": "#2563eb",
+    "ENCAMINHADA PARA CORREÇÃO": "#ea580c",
+    "ENCAMINHADA PARA ASSINATURA": "#7c3aed",
+    "ENCAMINHADA PARA CORREÇÃO + Minuta CORRIGIR": "#dc2626",
+    "Minuta Pronta- Aguardando Fechamento de Pauta": "#0d9488",
+    "Minuta PRONTA - apto para inclusão em pauta": "#059669",
+    "Minuta PRONTA - aguardando julgamento": "#4338ca",
+    "ASSINADA": "#16a34a"
   };
 
   var state = {
@@ -804,12 +796,12 @@
     }
 
     body.innerHTML = records.map(function (r) {
-      var statusStyle = STATUS_COLORS[r.status] || "#f1f5f9;color:#475569";
+      var statusColor = STATUS_COLORS[r.status] || "#475569";
       return (
         '<tr>' +
-        '<td><span class="badge badge-natureza">' + escapeHtml(r.natureza) + '</span></td>' +
+        '<td>' + escapeHtml(r.natureza) + '</td>' +
         '<td>' + escapeHtml(r.numeroProcesso) + '</td>' +
-        '<td><span class="badge" style="background:' + statusStyle.split(";")[0] + ';color:' + statusStyle.split(";")[1].replace("color:", "") + '">' + escapeHtml(r.status) + '</span></td>' +
+        '<td><span class="status-text" style="color:' + statusColor + '">' + escapeHtml(r.status) + '</span></td>' +
         '<td>' + formatDate(r.distribuicao) + '</td>' +
         '<td>' + escapeHtml(r.assunto) + '</td>' +
         '<td>' + formatDate(r.dataRetorno) + '</td>' +
