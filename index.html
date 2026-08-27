@@ -288,6 +288,36 @@
   .ms-option:hover { background: var(--card-tint); }
   .ms-option input { margin: 0; flex-shrink: 0; }
 
+  .date-panel { width: 210px; padding: 10px; }
+
+  .date-filter-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .date-filter-row label {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: none;
+    flex-shrink: 0;
+  }
+  .date-filter-row input[type="date"] {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 6px;
+    font-size: 0.78rem;
+    font-weight: 400;
+    text-transform: none;
+    color: var(--text);
+    background: #fff;
+  }
+  .date-panel .link-btn { padding: 2px 0 0; }
+
   tbody td {
     padding: 7px 10px;
     border-bottom: 1px solid var(--border);
@@ -527,6 +557,20 @@
         <tr>
           <th data-sort="distribuicao">
             <div class="th-label">Distribuição</div>
+            <div class="ms-filter" id="msDistribuicao">
+              <button type="button" class="th-filter ms-trigger" id="msDistribuicaoTrigger">Todas</button>
+              <div class="ms-panel date-panel" id="msDistribuicaoPanel">
+                <div class="date-filter-row">
+                  <label for="filterDistDe">De</label>
+                  <input type="date" id="filterDistDe">
+                </div>
+                <div class="date-filter-row">
+                  <label for="filterDistAte">Até</label>
+                  <input type="date" id="filterDistAte">
+                </div>
+                <button type="button" class="link-btn" id="btnClearDistFilter">Limpar</button>
+              </div>
+            </div>
           </th>
           <th data-sort="natureza">
             <div class="th-label">Natureza</div>
@@ -749,7 +793,9 @@
     sortDir: "desc",
     editingId: null,
     filterNatureza: [],
-    filterStatus: []
+    filterStatus: [],
+    filterDistDe: "",
+    filterDistAte: ""
   };
 
   function $(id) { return document.getElementById(id); }
@@ -1009,6 +1055,26 @@
     var naturezas = ["AI", "RemNecCiv", "ApCiv", "ApelRemNec"];
     renderMultiSelectPanel("msNaturezaPanel", naturezas, state.filterNatureza);
     updateMsTrigger("msNaturezaTrigger", state.filterNatureza, "Todas");
+
+    updateDistribuicaoTrigger();
+  }
+
+  function updateDistribuicaoTrigger() {
+    var trigger = $("msDistribuicaoTrigger");
+    var de = state.filterDistDe;
+    var ate = state.filterDistAte;
+    if (!de && !ate) {
+      trigger.textContent = "Todas";
+    } else if (de && ate && de === ate) {
+      trigger.textContent = formatDate(de);
+    } else if (de && ate) {
+      trigger.textContent = formatDate(de) + " - " + formatDate(ate);
+    } else if (de) {
+      trigger.textContent = "A partir de " + formatDate(de);
+    } else {
+      trigger.textContent = "Até " + formatDate(ate);
+    }
+    trigger.classList.toggle("active", !!(de || ate));
   }
 
   function escapeHtml(str) {
@@ -1030,6 +1096,8 @@
       if (elaborarVoto && r.elaborarVoto !== elaborarVoto) return false;
       if (numero && (r.numeroProcesso || "").toLowerCase().indexOf(numero) === -1) return false;
       if (assunto && (r.assunto || "").toLowerCase().indexOf(assunto) === -1) return false;
+      if (state.filterDistDe && (r.distribuicao || "") < state.filterDistDe) return false;
+      if (state.filterDistAte && (r.distribuicao || "") > state.filterDistAte) return false;
       return true;
     });
 
@@ -1387,8 +1455,12 @@
       $("filterNumero").value = "";
       $("filterAssunto").value = "";
       $("filterElaborarVoto").value = "";
+      $("filterDistDe").value = "";
+      $("filterDistAte").value = "";
       state.filterNatureza = [];
       state.filterStatus = [];
+      state.filterDistDe = "";
+      state.filterDistAte = "";
       populateFilterOptions();
       renderTable();
     });
@@ -1404,6 +1476,30 @@
     $("msStatusTrigger").addEventListener("click", function (e) {
       e.stopPropagation();
       toggleMsPanel("msStatusPanel", e.currentTarget);
+    });
+    $("msDistribuicaoTrigger").addEventListener("click", function (e) {
+      e.stopPropagation();
+      toggleMsPanel("msDistribuicaoPanel", e.currentTarget);
+    });
+    $("msDistribuicaoPanel").addEventListener("click", function (e) { e.stopPropagation(); });
+    $("filterDistDe").addEventListener("change", function () {
+      state.filterDistDe = this.value;
+      updateDistribuicaoTrigger();
+      renderTable();
+    });
+    $("filterDistAte").addEventListener("change", function () {
+      state.filterDistAte = this.value;
+      updateDistribuicaoTrigger();
+      renderTable();
+    });
+    $("btnClearDistFilter").addEventListener("click", function (e) {
+      e.stopPropagation();
+      state.filterDistDe = "";
+      state.filterDistAte = "";
+      $("filterDistDe").value = "";
+      $("filterDistAte").value = "";
+      updateDistribuicaoTrigger();
+      renderTable();
     });
     window.addEventListener("scroll", closeAllMsPanels, true);
     window.addEventListener("resize", closeAllMsPanels);
