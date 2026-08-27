@@ -923,16 +923,17 @@
 
     var cards = [
       { label: "Total de processos", num: total, icon: ICONS.folder, pill: null },
-      { label: "Em elaboração", num: emElaboracao, icon: ICONS.clock, pill: { text: emElaboracao + " ativos", type: "neutral" } },
-      { label: "Para correção", num: paraCorrigir, icon: ICONS.alert, pill: paraCorrigir > 0 ? { text: "atenção", type: "bad" } : { text: "em dia", type: "good" } },
+      { label: "Em elaboração", num: emElaboracao, icon: ICONS.clock, pill: { text: emElaboracao + " ativos", type: "neutral" }, iconBg: "#eab308" },
+      { label: "Para correção", num: paraCorrigir, icon: ICONS.alert, pill: paraCorrigir > 0 ? { text: "atenção", type: "bad" } : { text: "em dia", type: "good" }, iconBg: "#dc2626" },
       { label: "Assinadas", num: assinadas, icon: ICONS.check, pill: { text: "concluído", type: "good" } }
     ];
 
     $("summaryRow").innerHTML = cards.map(function (c) {
       var pillHtml = c.pill ? '<span class="trend-pill ' + c.pill.type + '">' + escapeHtml(c.pill.text) + '</span>' : "";
+      var iconStyle = c.iconBg ? ' style="background:' + c.iconBg + '"' : "";
       return (
         '<div class="summary-card">' +
-        '<div class="icon-tile">' + c.icon + '</div>' +
+        '<div class="icon-tile"' + iconStyle + '>' + c.icon + '</div>' +
         '<div class="summary-body">' +
         '<div class="label">' + c.label + '</div>' +
         '<div class="num-row"><span class="num">' + c.num + '</span>' + pillHtml + '</div>' +
