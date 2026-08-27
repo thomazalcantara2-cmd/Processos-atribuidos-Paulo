@@ -183,45 +183,12 @@
   .trend-pill.neutral { background: var(--card-tint); color: var(--text-muted); }
 
   .toolbar {
-    background: var(--card-tint);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 8px 10px;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     align-items: center;
-    margin-bottom: 16px;
-  }
-
-  .toolbar-search {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 6px 12px;
-    flex: 1;
-    min-width: 220px;
-  }
-  .toolbar-search svg { width: 15px; height: 15px; color: var(--text-muted); flex-shrink: 0; }
-  .toolbar-search input[type="text"] {
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 0.85rem;
-    color: var(--text);
-    width: 100%;
-  }
-
-  .toolbar select {
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 8px 14px;
-    font-size: 0.83rem;
-    background: #fff;
-    color: var(--text);
+    justify-content: flex-end;
+    margin-bottom: 10px;
   }
 
   .table-wrap {
@@ -235,7 +202,7 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.85rem;
+    font-size: 0.79rem;
     min-width: 1100px;
   }
 
@@ -243,22 +210,45 @@
     text-align: left;
     background: var(--card-tint);
     color: var(--text-muted);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    padding: 12px 14px;
+    padding: 7px 10px;
     border-bottom: 1px solid var(--border);
     white-space: nowrap;
-    cursor: pointer;
-    user-select: none;
+    vertical-align: top;
     position: sticky;
     top: 0;
   }
-  thead th:hover { color: var(--text); }
-  thead th .sort-arrow { font-size: 0.65rem; margin-left: 4px; opacity: 0.6; }
+
+  .th-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    user-select: none;
+    display: inline-block;
+    padding: 2px 0 5px;
+  }
+  .th-label:hover { color: var(--text); }
+  .th-label .sort-arrow { font-size: 0.65rem; margin-left: 4px; opacity: 0.6; }
+
+  .th-filter {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-size: 0.74rem;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    background: #fff;
+    color: var(--text);
+    max-width: 160px;
+  }
+  .th-filter:focus { outline: 2px solid #bcd2f5; border-color: var(--accent); }
+  th.col-actions { min-width: 74px; }
 
   tbody td {
-    padding: 11px 14px;
+    padding: 7px 10px;
     border-bottom: 1px solid var(--border);
     vertical-align: top;
   }
@@ -281,25 +271,25 @@
 
   .status-text {
     font-weight: 600;
-    font-size: 0.82rem;
+    font-size: 0.77rem;
     white-space: nowrap;
   }
 
-  .row-actions { display: flex; gap: 6px; white-space: nowrap; }
+  .row-actions { display: flex; gap: 5px; white-space: nowrap; }
 
   .icon-btn {
     border: 1px solid var(--border);
     background: var(--card-tint);
-    border-radius: 8px;
-    width: 30px;
-    height: 30px;
+    border-radius: 7px;
+    width: 25px;
+    height: 25px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     color: var(--text);
   }
-  .icon-btn svg { width: 15px; height: 15px; }
+  .icon-btn svg { width: 13px; height: 13px; }
   .icon-btn:hover { background: #dde9fb; }
   .icon-btn.danger:hover { background: var(--danger-bg); border-color: #f3b3b3; color: var(--danger-dark); }
 
@@ -439,16 +429,6 @@
   <div class="summary-row" id="summaryRow"></div>
 
   <div class="toolbar">
-    <div class="toolbar-search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
-      <input type="text" id="filterText" placeholder="Buscar por nº do processo ou assunto...">
-    </div>
-    <select id="filterNatureza">
-      <option value="">Natureza (todas)</option>
-    </select>
-    <select id="filterStatus">
-      <option value="">Status (todos)</option>
-    </select>
     <button class="btn btn-secondary btn-small" id="btnClearFilters" type="button">Limpar filtros</button>
     <button class="btn btn-secondary btn-small" id="btnRefresh" type="button">↻ Atualizar</button>
   </div>
@@ -457,14 +437,42 @@
     <table>
       <thead>
         <tr>
-          <th data-sort="natureza">Natureza</th>
-          <th data-sort="numeroProcesso">Nº Processo</th>
-          <th data-sort="status">Status</th>
-          <th data-sort="distribuicao">Distribuição</th>
-          <th data-sort="assunto">Assunto</th>
-          <th data-sort="dataRetorno">Data do retorno</th>
-          <th data-sort="elaborarVoto">Elaborar o voto</th>
-          <th>Ações</th>
+          <th data-sort="natureza">
+            <div class="th-label">Natureza</div>
+            <select class="th-filter" id="filterNatureza">
+              <option value="">Todas</option>
+            </select>
+          </th>
+          <th data-sort="numeroProcesso">
+            <div class="th-label">Nº Processo</div>
+            <input type="text" class="th-filter" id="filterNumero" placeholder="Buscar...">
+          </th>
+          <th data-sort="status">
+            <div class="th-label">Status</div>
+            <select class="th-filter" id="filterStatus">
+              <option value="">Todos</option>
+            </select>
+          </th>
+          <th data-sort="distribuicao">
+            <div class="th-label">Distribuição</div>
+          </th>
+          <th data-sort="assunto">
+            <div class="th-label">Assunto</div>
+            <input type="text" class="th-filter" id="filterAssunto" placeholder="Buscar...">
+          </th>
+          <th data-sort="dataRetorno">
+            <div class="th-label">Data do retorno</div>
+          </th>
+          <th data-sort="elaborarVoto">
+            <div class="th-label">Elaborar o voto</div>
+            <select class="th-filter" id="filterElaborarVoto">
+              <option value="">Todos</option>
+              <option>A SER ELABORADO</option>
+              <option>EM ELABORAÇÃO</option>
+              <option>ELABORADO</option>
+            </select>
+          </th>
+          <th class="col-actions"><div class="th-label" style="cursor:default">Ações</div></th>
         </tr>
       </thead>
       <tbody id="tableBody">
@@ -854,14 +862,14 @@
     var statuses = Object.keys(STATUS_COLORS);
     var statusSelect = $("filterStatus");
     var currentStatus = statusSelect.value;
-    statusSelect.innerHTML = '<option value="">Status (todos)</option>' +
+    statusSelect.innerHTML = '<option value="">Todos</option>' +
       statuses.map(function (s) { return '<option value="' + escapeHtml(s) + '">' + escapeHtml(s) + '</option>'; }).join("");
     statusSelect.value = currentStatus;
 
     var naturezas = ["AI", "RemNecCiv", "ApCiv", "ApelRemNec"];
     var naturezaSelect = $("filterNatureza");
     var currentNatureza = naturezaSelect.value;
-    naturezaSelect.innerHTML = '<option value="">Natureza (todas)</option>' +
+    naturezaSelect.innerHTML = '<option value="">Todas</option>' +
       naturezas.map(function (n) { return '<option value="' + n + '">' + n + '</option>'; }).join("");
     naturezaSelect.value = currentNatureza;
   }
@@ -873,17 +881,18 @@
   }
 
   function getFilteredSortedRecords() {
-    var text = $("filterText").value.trim().toLowerCase();
+    var numero = $("filterNumero").value.trim().toLowerCase();
+    var assunto = $("filterAssunto").value.trim().toLowerCase();
     var natureza = $("filterNatureza").value;
     var status = $("filterStatus").value;
+    var elaborarVoto = $("filterElaborarVoto").value;
 
     var filtered = state.records.filter(function (r) {
       if (natureza && r.natureza !== natureza) return false;
       if (status && r.status !== status) return false;
-      if (text) {
-        var haystack = (r.numeroProcesso + " " + r.assunto).toLowerCase();
-        if (haystack.indexOf(text) === -1) return false;
-      }
+      if (elaborarVoto && r.elaborarVoto !== elaborarVoto) return false;
+      if (numero && (r.numeroProcesso || "").toLowerCase().indexOf(numero) === -1) return false;
+      if (assunto && (r.assunto || "").toLowerCase().indexOf(assunto) === -1) return false;
       return true;
     });
 
@@ -930,13 +939,14 @@
   }
 
   function updateSortArrows() {
-    document.querySelectorAll("thead th[data-sort]").forEach(function (th) {
+    document.querySelectorAll("thead th[data-sort] .th-label").forEach(function (label) {
+      var th = label.closest("th");
       var field = th.getAttribute("data-sort");
-      var label = th.textContent.replace(/[▲▼]/g, "").trim();
+      var text = label.textContent.replace(/[▲▼]/g, "").trim();
       if (field === state.sortField) {
-        th.textContent = label + (state.sortDir === "asc" ? " ▲" : " ▼");
+        label.textContent = text + (state.sortDir === "asc" ? " ▲" : " ▼");
       } else {
-        th.textContent = label;
+        label.textContent = text;
       }
     });
   }
@@ -1206,19 +1216,23 @@
       e.target.value = "";
     });
     $("btnClearFilters").addEventListener("click", function () {
-      $("filterText").value = "";
+      $("filterNumero").value = "";
+      $("filterAssunto").value = "";
       $("filterNatureza").value = "";
       $("filterStatus").value = "";
+      $("filterElaborarVoto").value = "";
       renderTable();
     });
 
-    $("filterText").addEventListener("input", renderTable);
+    $("filterNumero").addEventListener("input", renderTable);
+    $("filterAssunto").addEventListener("input", renderTable);
     $("filterNatureza").addEventListener("change", renderTable);
     $("filterStatus").addEventListener("change", renderTable);
+    $("filterElaborarVoto").addEventListener("change", renderTable);
 
-    document.querySelectorAll("thead th[data-sort]").forEach(function (th) {
-      th.addEventListener("click", function () {
-        var field = th.getAttribute("data-sort");
+    document.querySelectorAll("thead th[data-sort] .th-label").forEach(function (label) {
+      label.addEventListener("click", function () {
+        var field = label.closest("th").getAttribute("data-sort");
         if (state.sortField === field) {
           state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
         } else {
