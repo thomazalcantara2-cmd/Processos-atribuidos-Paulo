@@ -925,7 +925,7 @@
       { label: "Total de processos", num: total, icon: ICONS.folder, pill: null },
       { label: "Em elaboração", num: emElaboracao, icon: ICONS.clock, pill: { text: emElaboracao + " ativos", type: "neutral" }, iconBg: "#eab308" },
       { label: "Para correção", num: paraCorrigir, icon: ICONS.alert, pill: paraCorrigir > 0 ? { text: "atenção", type: "bad" } : { text: "em dia", type: "good" }, iconBg: "#dc2626" },
-      { label: "Assinadas", num: assinadas, icon: ICONS.check, pill: { text: "concluído", type: "good" } }
+      { label: "Assinadas", num: assinadas, icon: ICONS.check, pill: { text: "concluído", type: "good" }, iconBg: "#16a34a" }
     ];
 
     $("summaryRow").innerHTML = cards.map(function (c) {
