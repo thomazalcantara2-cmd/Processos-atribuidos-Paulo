@@ -64,4 +64,5 @@ Para acessar a página de qualquer lugar (não só do computador local), é poss
 - Ordenação por qualquer coluna (clique no cabeçalho).
 - Contadores resumo (total, em elaboração, para correção, assinadas).
 - Exportação da lista filtrada em CSV.
+- Importação em massa via CSV (botão "Importar CSV" no topo): cadastra vários processos de uma vez, no mesmo formato gerado pela exportação (colunas Natureza;Nº Processo;Status;Distribuição;Assunto;Data do retorno;Elaborar o voto, separadas por `;`, datas em `dd/mm/aaaa`). Útil para trazer dados de uma planilha antiga sem digitar processo por processo.
 - Lista de assuntos pré-cadastrada, com opção de acrescentar novos assuntos pelo próprio formulário.
