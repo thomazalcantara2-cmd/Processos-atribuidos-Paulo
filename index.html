@@ -525,6 +525,9 @@
     <table>
       <thead>
         <tr>
+          <th data-sort="distribuicao">
+            <div class="th-label">Distribuição</div>
+          </th>
           <th data-sort="natureza">
             <div class="th-label">Natureza</div>
             <div class="ms-filter" id="msNatureza">
@@ -542,9 +545,6 @@
               <button type="button" class="th-filter ms-trigger" id="msStatusTrigger">Todos</button>
               <div class="ms-panel" id="msStatusPanel"></div>
             </div>
-          </th>
-          <th data-sort="distribuicao">
-            <div class="th-label">Distribuição</div>
           </th>
           <th data-sort="assunto">
             <div class="th-label">Assunto</div>
@@ -738,7 +738,7 @@
   };
 
   var ELABORAR_VOTO_COLORS = {
-    "A SER ELABORADO": "#64748b",
+    "A SER ELABORADO": "#dc2626",
     "EM ELABORAÇÃO": "#eab308",
     "ELABORADO": "#16a34a"
   };
@@ -1063,10 +1063,10 @@
       var votoDot = r.elaborarVoto ? '<span class="type-dot" style="background:' + votoColor + '"></span>' : "";
       return (
         '<tr>' +
+        '<td>' + formatDate(r.distribuicao) + '</td>' +
         '<td><span class="type-text">' + naturezaDot + escapeHtml(r.natureza) + '</span></td>' +
         '<td>' + escapeHtml(r.numeroProcesso) + '</td>' +
         '<td><span class="type-text status-text" style="color:' + statusColor + '">' + escapeHtml(r.status) + '</span></td>' +
-        '<td>' + formatDate(r.distribuicao) + '</td>' +
         '<td>' + escapeHtml(r.assunto) + '</td>' +
         '<td>' + formatDate(r.dataRetorno) + '</td>' +
         '<td><span class="type-text">' + votoDot + escapeHtml(r.elaborarVoto) + '</span></td>' +
