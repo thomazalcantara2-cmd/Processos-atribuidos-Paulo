@@ -419,6 +419,10 @@
     <button class="btn btn-ghost" id="btnSettings" type="button" title="Configurar planilha">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
     </button>
+    <button class="btn btn-ghost" id="btnImport" type="button" title="Importar CSV">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"></path><path d="m7 14 5-5 5 5"></path><path d="M4 3h16"></path></svg>
+    </button>
+    <input type="file" id="importFileInput" accept=".csv,text/csv" style="display:none">
     <button class="btn btn-ghost" id="btnExport" type="button" title="Exportar CSV">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M4 21h16"></path></svg>
     </button>
@@ -1084,12 +1088,123 @@
     document.body.removeChild(link);
   }
 
+  // ---------- CSV import ----------
+
+  function parseCsv(text) {
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+    var lines = text.split(/\r\n|\n|\r/).filter(function (l) { return l.length > 0; });
+    return lines.map(function (line) {
+      var result = [];
+      var cur = "";
+      var inQuotes = false;
+      for (var i = 0; i < line.length; i++) {
+        var ch = line[i];
+        if (inQuotes) {
+          if (ch === '"') {
+            if (line[i + 1] === '"') { cur += '"'; i++; }
+            else { inQuotes = false; }
+          } else {
+            cur += ch;
+          }
+        } else if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ';') {
+          result.push(cur);
+          cur = "";
+        } else {
+          cur += ch;
+        }
+      }
+      result.push(cur);
+      return result;
+    });
+  }
+
+  function parseBrDate(str) {
+    str = (str || "").trim();
+    var m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (!m) return "";
+    return m[3] + "-" + m[2].padStart(2, "0") + "-" + m[1].padStart(2, "0");
+  }
+
+  function importCsvRows(rows) {
+    var dataRows = rows.slice(1).filter(function (r) {
+      return r.some(function (c) { return c && c.trim(); });
+    });
+    var imported = 0;
+    var skippedLines = [];
+
+    function next(i) {
+      if (i >= dataRows.length) {
+        return Promise.resolve({ total: dataRows.length, imported: imported, skippedLines: skippedLines });
+      }
+      var row = dataRows[i];
+      var record = {
+        id: null,
+        natureza: (row[0] || "").trim(),
+        numeroProcesso: (row[1] || "").trim(),
+        status: (row[2] || "").trim(),
+        distribuicao: parseBrDate(row[3]),
+        assunto: (row[4] || "").trim(),
+        dataRetorno: parseBrDate(row[5]),
+        elaborarVoto: (row[6] || "").trim()
+      };
+      if (!record.numeroProcesso) {
+        skippedLines.push(i + 2);
+        return next(i + 1);
+      }
+      return createRecord(record).then(function () {
+        imported++;
+        return next(i + 1);
+      }).catch(function () {
+        skippedLines.push(i + 2);
+        return next(i + 1);
+      });
+    }
+
+    return next(0);
+  }
+
+  function importCsvFile(file) {
+    var btn = $("btnImport");
+    btn.disabled = true;
+    showBanner("Importando processos...", false);
+
+    var reader = new FileReader();
+    reader.onload = function () {
+      var rows = parseCsv(String(reader.result));
+      importCsvRows(rows).then(function (result) {
+        var msg = "Importação concluída: " + result.imported + " de " + result.total + " processo(s) importado(s).";
+        if (result.skippedLines.length) {
+          msg += " Linhas ignoradas (sem nº de processo): " + result.skippedLines.join(", ") + ".";
+        }
+        showBanner(msg, result.skippedLines.length > 0);
+        refresh();
+      }).catch(function (err) {
+        showBanner("Falha ao importar: " + err.message, true);
+      }).finally(function () {
+        btn.disabled = false;
+      });
+    };
+    reader.onerror = function () {
+      showBanner("Não foi possível ler o arquivo selecionado.", true);
+      btn.disabled = false;
+    };
+    reader.readAsText(file, "UTF-8");
+  }
+
   // ---------- Event bindings ----------
 
   function bindEvents() {
     $("btnNew").addEventListener("click", function () { openFormModal(null); });
     $("btnRefresh").addEventListener("click", refresh);
     $("btnExport").addEventListener("click", exportCsv);
+    $("btnImport").addEventListener("click", function () { $("importFileInput").click(); });
+    $("importFileInput").addEventListener("change", function (e) {
+      var file = e.target.files[0];
+      if (file) importCsvFile(file);
+      e.target.value = "";
+    });
     $("btnClearFilters").addEventListener("click", function () {
       $("filterText").value = "";
       $("filterNatureza").value = "";
