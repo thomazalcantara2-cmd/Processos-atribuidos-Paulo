@@ -241,6 +241,54 @@
   .th-filter:focus { outline: 2px solid #bcd2f5; border-color: var(--accent); }
   th.col-actions { min-width: 74px; }
 
+  .ms-filter { position: relative; }
+
+  .ms-trigger {
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .ms-trigger::after { content: "\25BE"; font-size: 0.65rem; opacity: 0.6; flex-shrink: 0; }
+  .ms-trigger.active { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+  .ms-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 190px;
+    max-height: 240px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(20, 30, 60, 0.14);
+    padding: 6px;
+    z-index: 50;
+  }
+  .ms-panel.show { display: block; }
+
+  .ms-option {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 6px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--text);
+    cursor: pointer;
+    white-space: normal;
+  }
+  .ms-option:hover { background: var(--card-tint); }
+  .ms-option input { margin: 0; flex-shrink: 0; }
+
   tbody td {
     padding: 7px 10px;
     border-bottom: 1px solid var(--border);
@@ -432,9 +480,10 @@
         <tr>
           <th data-sort="natureza">
             <div class="th-label">Natureza</div>
-            <select class="th-filter" id="filterNatureza">
-              <option value="">Todas</option>
-            </select>
+            <div class="ms-filter" id="msNatureza">
+              <button type="button" class="th-filter ms-trigger" id="msNaturezaTrigger">Todas</button>
+              <div class="ms-panel" id="msNaturezaPanel"></div>
+            </div>
           </th>
           <th data-sort="numeroProcesso">
             <div class="th-label">Nº Processo</div>
@@ -442,9 +491,10 @@
           </th>
           <th data-sort="status">
             <div class="th-label">Status</div>
-            <select class="th-filter" id="filterStatus">
-              <option value="">Todos</option>
-            </select>
+            <div class="ms-filter" id="msStatus">
+              <button type="button" class="th-filter ms-trigger" id="msStatusTrigger">Todos</button>
+              <div class="ms-panel" id="msStatusPanel"></div>
+            </div>
           </th>
           <th data-sort="distribuicao">
             <div class="th-label">Distribuição</div>
@@ -633,7 +683,9 @@
     records: [],
     sortField: "distribuicao",
     sortDir: "desc",
-    editingId: null
+    editingId: null,
+    filterNatureza: [],
+    filterStatus: []
   };
 
   function $(id) { return document.getElementById(id); }
@@ -851,20 +903,40 @@
     }).join("");
   }
 
+  function renderMultiSelectPanel(panelId, options, selected) {
+    $(panelId).innerHTML = options.map(function (opt) {
+      var checked = selected.indexOf(opt) !== -1 ? "checked" : "";
+      return '<label class="ms-option"><input type="checkbox" value="' + escapeHtml(opt) + '" ' + checked + '><span>' + escapeHtml(opt) + '</span></label>';
+    }).join("");
+  }
+
+  function updateMsTrigger(triggerId, selected, allLabel) {
+    var trigger = $(triggerId);
+    if (selected.length === 0) trigger.textContent = allLabel;
+    else if (selected.length === 1) trigger.textContent = selected[0];
+    else trigger.textContent = selected.length + " selecionadas";
+    trigger.classList.toggle("active", selected.length > 0);
+  }
+
+  function closeAllMsPanels() {
+    document.querySelectorAll(".ms-panel.show").forEach(function (p) { p.classList.remove("show"); });
+  }
+
+  function toggleMsPanel(panelId) {
+    var panel = $(panelId);
+    var isOpen = panel.classList.contains("show");
+    closeAllMsPanels();
+    if (!isOpen) panel.classList.add("show");
+  }
+
   function populateFilterOptions() {
     var statuses = Object.keys(STATUS_COLORS);
-    var statusSelect = $("filterStatus");
-    var currentStatus = statusSelect.value;
-    statusSelect.innerHTML = '<option value="">Todos</option>' +
-      statuses.map(function (s) { return '<option value="' + escapeHtml(s) + '">' + escapeHtml(s) + '</option>'; }).join("");
-    statusSelect.value = currentStatus;
+    renderMultiSelectPanel("msStatusPanel", statuses, state.filterStatus);
+    updateMsTrigger("msStatusTrigger", state.filterStatus, "Todos");
 
     var naturezas = ["AI", "RemNecCiv", "ApCiv", "ApelRemNec"];
-    var naturezaSelect = $("filterNatureza");
-    var currentNatureza = naturezaSelect.value;
-    naturezaSelect.innerHTML = '<option value="">Todas</option>' +
-      naturezas.map(function (n) { return '<option value="' + n + '">' + n + '</option>'; }).join("");
-    naturezaSelect.value = currentNatureza;
+    renderMultiSelectPanel("msNaturezaPanel", naturezas, state.filterNatureza);
+    updateMsTrigger("msNaturezaTrigger", state.filterNatureza, "Todas");
   }
 
   function escapeHtml(str) {
@@ -876,13 +948,13 @@
   function getFilteredSortedRecords() {
     var numero = $("filterNumero").value.trim().toLowerCase();
     var assunto = $("filterAssunto").value.trim().toLowerCase();
-    var natureza = $("filterNatureza").value;
-    var status = $("filterStatus").value;
+    var natureza = state.filterNatureza;
+    var status = state.filterStatus;
     var elaborarVoto = $("filterElaborarVoto").value;
 
     var filtered = state.records.filter(function (r) {
-      if (natureza && r.natureza !== natureza) return false;
-      if (status && r.status !== status) return false;
+      if (natureza.length && natureza.indexOf(r.natureza) === -1) return false;
+      if (status.length && status.indexOf(r.status) === -1) return false;
       if (elaborarVoto && r.elaborarVoto !== elaborarVoto) return false;
       if (numero && (r.numeroProcesso || "").toLowerCase().indexOf(numero) === -1) return false;
       if (assunto && (r.assunto || "").toLowerCase().indexOf(assunto) === -1) return false;
@@ -1211,17 +1283,47 @@
     $("btnClearFilters").addEventListener("click", function () {
       $("filterNumero").value = "";
       $("filterAssunto").value = "";
-      $("filterNatureza").value = "";
-      $("filterStatus").value = "";
       $("filterElaborarVoto").value = "";
+      state.filterNatureza = [];
+      state.filterStatus = [];
+      populateFilterOptions();
       renderTable();
     });
 
     $("filterNumero").addEventListener("input", renderTable);
     $("filterAssunto").addEventListener("input", renderTable);
-    $("filterNatureza").addEventListener("change", renderTable);
-    $("filterStatus").addEventListener("change", renderTable);
     $("filterElaborarVoto").addEventListener("change", renderTable);
+
+    $("msNaturezaTrigger").addEventListener("click", function (e) {
+      e.stopPropagation();
+      toggleMsPanel("msNaturezaPanel");
+    });
+    $("msStatusTrigger").addEventListener("click", function (e) {
+      e.stopPropagation();
+      toggleMsPanel("msStatusPanel");
+    });
+
+    $("msNaturezaPanel").addEventListener("click", function (e) { e.stopPropagation(); });
+    $("msNaturezaPanel").addEventListener("change", function (e) {
+      if (e.target.type !== "checkbox") return;
+      var idx = state.filterNatureza.indexOf(e.target.value);
+      if (e.target.checked) { if (idx === -1) state.filterNatureza.push(e.target.value); }
+      else if (idx !== -1) { state.filterNatureza.splice(idx, 1); }
+      updateMsTrigger("msNaturezaTrigger", state.filterNatureza, "Todas");
+      renderTable();
+    });
+
+    $("msStatusPanel").addEventListener("click", function (e) { e.stopPropagation(); });
+    $("msStatusPanel").addEventListener("change", function (e) {
+      if (e.target.type !== "checkbox") return;
+      var idx = state.filterStatus.indexOf(e.target.value);
+      if (e.target.checked) { if (idx === -1) state.filterStatus.push(e.target.value); }
+      else if (idx !== -1) { state.filterStatus.splice(idx, 1); }
+      updateMsTrigger("msStatusTrigger", state.filterStatus, "Todos");
+      renderTable();
+    });
+
+    document.addEventListener("click", closeAllMsPanels);
 
     document.querySelectorAll("thead th[data-sort] .th-label").forEach(function (label) {
       label.addEventListener("click", function () {
