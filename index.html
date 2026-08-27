@@ -6,19 +6,24 @@
 <title>Processos Atribuídos</title>
 <style>
   :root {
-    --bg: #f4f6f9;
+    --page-bg: #eae8e4;
+    --bg: #ffffff;
     --card: #ffffff;
-    --border: #dde3ea;
-    --text: #1c2733;
-    --text-muted: #64748b;
-    --primary: #1e3a5f;
-    --primary-dark: #16293f;
-    --accent: #2563eb;
+    --card-tint: #f6f5f2;
+    --border: #e7e4de;
+    --text: #16181d;
+    --text-muted: #6b7280;
+    --primary: #16181d;
+    --primary-dark: #000000;
+    --accent: #16181d;
+    --green: #16a34a;
+    --green-bg: #e2f5e8;
     --danger: #dc2626;
+    --danger-bg: #fbe7e7;
     --danger-dark: #b91c1c;
     --success: #16a34a;
-    --radius: 10px;
-    --shadow: 0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04);
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(20, 20, 20, 0.04), 0 1px 1px rgba(20, 20, 20, 0.03);
   }
 
   * { box-sizing: border-box; }
@@ -26,15 +31,24 @@
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: var(--bg);
+    background: var(--page-bg);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
   }
 
+  .app-shell {
+    max-width: 1500px;
+    margin: 22px auto;
+    background: var(--bg);
+    border-radius: 22px;
+    box-shadow: 0 1px 2px rgba(20,20,20,0.04), 0 12px 32px rgba(20,20,20,0.06);
+    overflow: hidden;
+  }
+
   header.topbar {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: #fff;
-    padding: 20px 28px;
+    background: var(--bg);
+    color: var(--text);
+    padding: 22px 30px 6px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -44,15 +58,15 @@
 
   header.topbar h1 {
     margin: 0;
-    font-size: 1.35rem;
-    font-weight: 600;
-    letter-spacing: 0.2px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
   }
 
   header.topbar .subtitle {
     margin: 2px 0 0;
     font-size: 0.82rem;
-    color: #c9d6e6;
+    color: var(--text-muted);
   }
 
   .topbar-actions {
@@ -63,36 +77,46 @@
 
   .btn {
     border: none;
-    border-radius: 8px;
-    padding: 9px 16px;
-    font-size: 0.88rem;
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-size: 0.86rem;
     font-weight: 600;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    transition: filter 0.15s ease, transform 0.05s ease;
+    transition: filter 0.15s ease, transform 0.05s ease, background 0.15s ease;
   }
   .btn:active { transform: translateY(1px); }
 
-  .btn-primary { background: var(--accent); color: #fff; }
-  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.25); }
 
-  .btn-ghost { background: rgba(255,255,255,0.12); color: #fff; }
-  .btn-ghost:hover { background: rgba(255,255,255,0.2); }
+  .btn-ghost {
+    background: var(--card-tint);
+    color: var(--text);
+    border: 1px solid var(--border);
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 10px;
+    justify-content: center;
+  }
+  .btn-ghost:hover { background: #edece8; }
+  .btn-ghost svg { width: 17px; height: 17px; }
 
-  .btn-secondary { background: #eef1f5; color: var(--text); }
-  .btn-secondary:hover { background: #e2e7ed; }
+  .btn-secondary { background: var(--card-tint); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: #edece8; }
 
   .btn-danger { background: var(--danger); color: #fff; }
   .btn-danger:hover { background: var(--danger-dark); }
 
-  .btn-small { padding: 6px 10px; font-size: 0.78rem; border-radius: 6px; }
+  .btn-small { padding: 7px 14px; font-size: 0.78rem; }
 
   main {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 22px 28px 60px;
+    padding: 14px 30px 34px;
   }
 
   .status-banner {
@@ -121,37 +145,84 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 12px 18px;
-    min-width: 140px;
+    padding: 14px 18px;
+    min-width: 200px;
+    flex: 1;
     box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
-  .summary-card .num { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
-  .summary-card .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  .summary-card .icon-tile {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .summary-card .icon-tile svg { width: 18px; height: 18px; }
+  .summary-card .summary-body { flex: 1; min-width: 0; }
+  .summary-card .label { font-size: 0.76rem; color: var(--text-muted); margin-bottom: 2px; }
+  .summary-card .num-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .summary-card .num { font-size: 1.4rem; font-weight: 700; color: var(--text); line-height: 1; }
+
+  .trend-pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .trend-pill.good { background: var(--green-bg); color: #15803d; }
+  .trend-pill.bad { background: var(--danger-bg); color: #b91c1c; }
+  .trend-pill.neutral { background: var(--card-tint); color: var(--text-muted); }
 
   .toolbar {
-    background: var(--card);
+    background: var(--card-tint);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 14px 16px;
+    border-radius: 999px;
+    padding: 8px 10px;
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
     margin-bottom: 16px;
   }
 
-  .toolbar input[type="text"],
-  .toolbar select {
+  .toolbar-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
     border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 8px 10px;
+    border-radius: 999px;
+    padding: 6px 12px;
+    flex: 1;
+    min-width: 220px;
+  }
+  .toolbar-search svg { width: 15px; height: 15px; color: var(--text-muted); flex-shrink: 0; }
+  .toolbar-search input[type="text"] {
+    border: none;
+    outline: none;
+    background: transparent;
     font-size: 0.85rem;
-    background: #fbfcfd;
     color: var(--text);
+    width: 100%;
   }
 
-  .toolbar input[type="text"] { min-width: 220px; flex: 1; }
+  .toolbar select {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 0.83rem;
+    background: #fff;
+    color: var(--text);
+  }
 
   .table-wrap {
     background: var(--card);
@@ -170,7 +241,7 @@
 
   thead th {
     text-align: left;
-    background: #f8fafc;
+    background: var(--card-tint);
     color: var(--text-muted);
     font-size: 0.72rem;
     text-transform: uppercase;
@@ -192,8 +263,8 @@
     vertical-align: top;
   }
 
-  tbody tr:nth-child(even) { background: #f5f8fb; }
-  tbody tr:hover { background: #e8f0fb; }
+  tbody tr:nth-child(even) { background: #faf9f7; }
+  tbody tr:hover { background: #f0efe9; }
   tbody tr:last-child td { border-bottom: none; }
 
   .type-text {
@@ -218,18 +289,19 @@
 
   .icon-btn {
     border: 1px solid var(--border);
-    background: #fff;
-    border-radius: 6px;
+    background: var(--card-tint);
+    border-radius: 8px;
     width: 30px;
     height: 30px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 0.9rem;
+    color: var(--text);
   }
-  .icon-btn:hover { background: #f1f5f9; }
-  .icon-btn.danger:hover { background: #fef2f2; border-color: #f3b3b3; }
+  .icon-btn svg { width: 15px; height: 15px; }
+  .icon-btn:hover { background: #edece8; }
+  .icon-btn.danger:hover { background: var(--danger-bg); border-color: #f3b3b3; color: var(--danger-dark); }
 
   .modal-overlay {
     display: none;
@@ -246,7 +318,7 @@
 
   .modal {
     background: #fff;
-    border-radius: 12px;
+    border-radius: 18px;
     width: 100%;
     max-width: 640px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.25);
@@ -292,14 +364,14 @@
     width: 100%;
     padding: 9px 10px;
     border: 1px solid var(--border);
-    border-radius: 7px;
+    border-radius: 9px;
     font-size: 0.88rem;
-    background: #fbfcfd;
+    background: #fbfaf8;
     color: var(--text);
   }
 
   .field select:focus,
-  .field input:focus { outline: 2px solid #bcd2f5; border-color: var(--accent); }
+  .field input:focus { outline: 2px solid #d8d5cf; border-color: var(--accent); }
 
   .assunto-add-row {
     display: flex;
@@ -312,12 +384,13 @@
   .link-btn {
     background: none;
     border: none;
-    color: var(--accent);
+    color: #15803d;
     font-size: 0.78rem;
     font-weight: 600;
     cursor: pointer;
     padding: 4px 0;
   }
+  .link-btn:hover { text-decoration: underline; }
 
   footer.page-footer {
     text-align: center;
@@ -327,23 +400,32 @@
   }
 
   @media (max-width: 640px) {
-    header.topbar { padding: 16px; }
-    main { padding: 16px; }
+    .app-shell { margin: 0; border-radius: 0; }
+    header.topbar { padding: 16px 16px 4px; }
+    main { padding: 12px 16px 24px; }
     .form-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
+<div class="app-shell">
 <header class="topbar">
   <div>
     <h1>Processos Atribuídos</h1>
     <p class="subtitle" id="connectionSubtitle">Modo local — configure a integração com o Google Sheets</p>
   </div>
   <div class="topbar-actions">
-    <button class="btn btn-ghost" id="btnSettings" type="button">⚙️ Configurar planilha</button>
-    <button class="btn btn-ghost" id="btnExport" type="button">⬇️ Exportar CSV</button>
-    <button class="btn btn-primary" id="btnNew" type="button">+ Novo processo</button>
+    <button class="btn btn-ghost" id="btnSettings" type="button" title="Configurar planilha">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    </button>
+    <button class="btn btn-ghost" id="btnExport" type="button" title="Exportar CSV">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M4 21h16"></path></svg>
+    </button>
+    <button class="btn btn-primary" id="btnNew" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+      Novo processo
+    </button>
   </div>
 </header>
 
@@ -353,7 +435,10 @@
   <div class="summary-row" id="summaryRow"></div>
 
   <div class="toolbar">
-    <input type="text" id="filterText" placeholder="Buscar por nº do processo ou assunto...">
+    <div class="toolbar-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <input type="text" id="filterText" placeholder="Buscar por nº do processo ou assunto...">
+    </div>
     <select id="filterNatureza">
       <option value="">Natureza (todas)</option>
     </select>
@@ -386,6 +471,7 @@
 
   <footer class="page-footer">Processos Atribuídos &middot; dados salvos em planilha do Google via Apps Script</footer>
 </main>
+</div>
 
 <!-- Modal: novo/editar processo -->
 <div class="modal-overlay" id="formModalOverlay">
@@ -720,6 +806,15 @@
     return parts[2] + "/" + parts[1] + "/" + parts[0];
   }
 
+  var ICONS = {
+    folder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path></svg>',
+    edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>',
+    alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.3 3.9 1.8 18a1.8 1.8 0 0 0 1.6 2.7h17.2a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"></path></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>',
+    trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>'
+  };
+
   function renderSummary() {
     var total = state.records.length;
     var counts = {};
@@ -731,14 +826,23 @@
     var paraCorrigir = (counts["ENCAMINHADA PARA CORREÇÃO"] || 0) + (counts["ENCAMINHADA PARA CORREÇÃO + Minuta CORRIGIR"] || 0);
 
     var cards = [
-      { label: "Total de processos", num: total },
-      { label: "Em elaboração", num: emElaboracao },
-      { label: "Para correção", num: paraCorrigir },
-      { label: "Assinadas", num: assinadas }
+      { label: "Total de processos", num: total, icon: ICONS.folder, pill: null },
+      { label: "Em elaboração", num: emElaboracao, icon: ICONS.clock, pill: { text: emElaboracao + " ativos", type: "neutral" } },
+      { label: "Para correção", num: paraCorrigir, icon: ICONS.alert, pill: paraCorrigir > 0 ? { text: "atenção", type: "bad" } : { text: "em dia", type: "good" } },
+      { label: "Assinadas", num: assinadas, icon: ICONS.check, pill: { text: "concluído", type: "good" } }
     ];
 
     $("summaryRow").innerHTML = cards.map(function (c) {
-      return '<div class="summary-card"><div class="num">' + c.num + '</div><div class="label">' + c.label + '</div></div>';
+      var pillHtml = c.pill ? '<span class="trend-pill ' + c.pill.type + '">' + escapeHtml(c.pill.text) + '</span>' : "";
+      return (
+        '<div class="summary-card">' +
+        '<div class="icon-tile">' + c.icon + '</div>' +
+        '<div class="summary-body">' +
+        '<div class="label">' + c.label + '</div>' +
+        '<div class="num-row"><span class="num">' + c.num + '</span>' + pillHtml + '</div>' +
+        '</div>' +
+        '</div>'
+      );
     }).join("");
   }
 
@@ -813,8 +917,8 @@
         '<td>' + formatDate(r.dataRetorno) + '</td>' +
         '<td>' + escapeHtml(r.elaborarVoto) + '</td>' +
         '<td><div class="row-actions">' +
-        '<button class="icon-btn" title="Editar" data-action="edit" data-id="' + escapeHtml(r.id) + '">✎</button>' +
-        '<button class="icon-btn danger" title="Excluir" data-action="delete" data-id="' + escapeHtml(r.id) + '">🗑</button>' +
+        '<button class="icon-btn" title="Editar" data-action="edit" data-id="' + escapeHtml(r.id) + '">' + ICONS.edit + '</button>' +
+        '<button class="icon-btn danger" title="Excluir" data-action="delete" data-id="' + escapeHtml(r.id) + '">' + ICONS.trash + '</button>' +
         '</div></td>' +
         '</tr>'
       );
