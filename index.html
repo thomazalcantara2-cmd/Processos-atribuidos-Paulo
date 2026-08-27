@@ -413,6 +413,42 @@
   .assunto-add-row input { flex: 1; }
   .assunto-add-row.hidden { display: none; }
 
+  .combo { position: relative; }
+
+  .combo-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    max-height: 230px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    box-shadow: 0 8px 24px rgba(20, 30, 60, 0.14);
+    padding: 6px;
+    z-index: 60;
+  }
+  .combo-panel.show { display: block; }
+
+  .combo-option {
+    padding: 7px 9px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .combo-option:hover,
+  .combo-option.active { background: var(--card-tint); }
+  .combo-option.selected { font-weight: 600; color: var(--accent); }
+
+  .combo-empty {
+    padding: 8px 9px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
   .link-btn {
     background: none;
     border: none;
@@ -577,8 +613,12 @@
             <input type="date" id="fDataRetorno">
           </div>
           <div class="field full">
-            <label for="fAssunto">5 — Assunto</label>
-            <select id="fAssunto" required></select>
+            <label for="fAssuntoInput">5 — Assunto</label>
+            <div class="combo" id="assuntoCombo">
+              <input type="text" id="fAssuntoInput" class="combo-input" placeholder="Buscar assunto..." autocomplete="off">
+              <input type="hidden" id="fAssunto" required>
+              <div class="combo-panel" id="assuntoComboPanel"></div>
+            </div>
             <button type="button" class="link-btn" id="btnToggleNewAssunto">+ Adicionar novo assunto</button>
             <div class="assunto-add-row hidden" id="newAssuntoRow">
               <input type="text" id="fNewAssunto" placeholder="Digite o novo assunto...">
@@ -1034,13 +1074,40 @@
 
   // ---------- Form modal ----------
 
-  function populateAssuntoSelect(selected) {
-    var select = $("fAssunto");
+  function setAssuntoValue(value) {
+    $("fAssunto").value = value || "";
+    $("fAssuntoInput").value = value || "";
+  }
+
+  function renderAssuntoOptions(filterText) {
     var options = allAssuntos();
-    select.innerHTML = '<option value="">Selecione...</option>' +
-      options.map(function (a) {
-        return '<option value="' + escapeHtml(a) + '"' + (a === selected ? " selected" : "") + '>' + escapeHtml(a) + '</option>';
-      }).join("");
+    var text = (filterText || "").trim().toLowerCase();
+    var filtered = text ? options.filter(function (o) { return o.toLowerCase().indexOf(text) !== -1; }) : options;
+    var panel = $("assuntoComboPanel");
+    var selectedValue = $("fAssunto").value;
+    if (filtered.length === 0) {
+      panel.innerHTML = '<div class="combo-empty">Nenhum assunto encontrado.</div>';
+      return;
+    }
+    panel.innerHTML = filtered.map(function (opt) {
+      var cls = "combo-option" + (opt === selectedValue ? " selected" : "");
+      return '<div class="' + cls + '" data-value="' + escapeHtml(opt) + '">' + escapeHtml(opt) + '</div>';
+    }).join("");
+  }
+
+  function showAssuntoPanel() {
+    renderAssuntoOptions($("fAssuntoInput").value);
+    $("assuntoComboPanel").classList.add("show");
+  }
+
+  function hideAssuntoPanel() {
+    $("assuntoComboPanel").classList.remove("show");
+    $("fAssuntoInput").value = $("fAssunto").value || "";
+  }
+
+  function populateAssuntoCombo(selected) {
+    setAssuntoValue(selected);
+    $("assuntoComboPanel").classList.remove("show");
   }
 
   function openFormModal(record) {
@@ -1053,7 +1120,7 @@
     $("fDistribuicao").value = record ? (record.distribuicao || "").slice(0, 10) : "";
     $("fDataRetorno").value = record ? (record.dataRetorno || "").slice(0, 10) : "";
     $("fElaborarVoto").value = record ? record.elaborarVoto : "";
-    populateAssuntoSelect(record ? record.assunto : "");
+    populateAssuntoCombo(record ? record.assunto : "");
     $("newAssuntoRow").classList.add("hidden");
     $("fNewAssunto").value = "";
     $("formModalOverlay").classList.add("show");
@@ -1374,9 +1441,28 @@
       var value = $("fNewAssunto").value.trim();
       if (!value) return;
       saveCustomAssunto(value);
-      populateAssuntoSelect(value);
+      populateAssuntoCombo(value);
       $("fNewAssunto").value = "";
       $("newAssuntoRow").classList.add("hidden");
+    });
+
+    $("fAssuntoInput").addEventListener("focus", showAssuntoPanel);
+    $("fAssuntoInput").addEventListener("input", showAssuntoPanel);
+    $("fAssuntoInput").addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        hideAssuntoPanel();
+        e.target.blur();
+      }
+    });
+    $("assuntoComboPanel").addEventListener("click", function (e) {
+      e.stopPropagation();
+      var optionEl = e.target.closest(".combo-option");
+      if (!optionEl) return;
+      setAssuntoValue(optionEl.getAttribute("data-value"));
+      $("assuntoComboPanel").classList.remove("show");
+    });
+    document.addEventListener("click", function (e) {
+      if (!$("assuntoCombo").contains(e.target)) hideAssuntoPanel();
     });
 
     $("btnSettings").addEventListener("click", openSettingsModal);
