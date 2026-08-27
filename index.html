@@ -316,6 +316,18 @@
     white-space: nowrap;
   }
 
+  .type-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+    flex-shrink: 0;
+    position: relative;
+    top: -1px;
+  }
+
   .row-actions { display: flex; gap: 5px; white-space: nowrap; }
 
   .icon-btn {
@@ -718,6 +730,19 @@
     "ASSINADA": "#16a34a"
   };
 
+  var NATUREZA_COLORS = {
+    "AI": "#2563eb",
+    "RemNecCiv": "#7c3aed",
+    "ApCiv": "#0d9488",
+    "ApelRemNec": "#ea580c"
+  };
+
+  var ELABORAR_VOTO_COLORS = {
+    "A SER ELABORADO": "#64748b",
+    "EM ELABORAÇÃO": "#2563eb",
+    "ELABORADO": "#16a34a"
+  };
+
   var state = {
     records: [],
     sortField: "distribuicao",
@@ -1032,15 +1057,19 @@
 
     body.innerHTML = records.map(function (r) {
       var statusColor = STATUS_COLORS[r.status] || "#475569";
+      var naturezaColor = NATUREZA_COLORS[r.natureza] || "#64748b";
+      var votoColor = ELABORAR_VOTO_COLORS[r.elaborarVoto] || "#64748b";
+      var naturezaDot = '<span class="type-dot" style="background:' + naturezaColor + '"></span>';
+      var votoDot = r.elaborarVoto ? '<span class="type-dot" style="background:' + votoColor + '"></span>' : "";
       return (
         '<tr>' +
-        '<td><span class="type-text">' + escapeHtml(r.natureza) + '</span></td>' +
+        '<td><span class="type-text">' + naturezaDot + escapeHtml(r.natureza) + '</span></td>' +
         '<td>' + escapeHtml(r.numeroProcesso) + '</td>' +
         '<td><span class="type-text status-text" style="color:' + statusColor + '">' + escapeHtml(r.status) + '</span></td>' +
         '<td>' + formatDate(r.distribuicao) + '</td>' +
         '<td>' + escapeHtml(r.assunto) + '</td>' +
         '<td>' + formatDate(r.dataRetorno) + '</td>' +
-        '<td>' + escapeHtml(r.elaborarVoto) + '</td>' +
+        '<td><span class="type-text">' + votoDot + escapeHtml(r.elaborarVoto) + '</span></td>' +
         '<td><div class="row-actions">' +
         '<button class="icon-btn" title="Editar" data-action="edit" data-id="' + escapeHtml(r.id) + '">' + ICONS.edit + '</button>' +
         '<button class="icon-btn danger" title="Excluir" data-action="delete" data-id="' + escapeHtml(r.id) + '">' + ICONS.trash + '</button>' +
