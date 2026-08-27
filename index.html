@@ -201,7 +201,7 @@
   }
 
   thead th {
-    text-align: left;
+    text-align: center;
     background: var(--card-tint);
     color: var(--text-muted);
     padding: 7px 10px;
@@ -227,6 +227,7 @@
   .th-filter {
     display: block;
     width: 100%;
+    text-align: left;
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 4px 6px;
@@ -257,9 +258,7 @@
 
   .ms-panel {
     display: none;
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
+    position: fixed;
     min-width: 190px;
     max-height: 240px;
     overflow-y: auto;
@@ -268,7 +267,7 @@
     border-radius: 8px;
     box-shadow: 0 8px 24px rgba(20, 30, 60, 0.14);
     padding: 6px;
-    z-index: 50;
+    z-index: 200;
   }
   .ms-panel.show { display: block; }
 
@@ -962,11 +961,18 @@
     document.querySelectorAll(".ms-panel.show").forEach(function (p) { p.classList.remove("show"); });
   }
 
-  function toggleMsPanel(panelId) {
+  function toggleMsPanel(panelId, triggerEl) {
     var panel = $(panelId);
     var isOpen = panel.classList.contains("show");
     closeAllMsPanels();
-    if (!isOpen) panel.classList.add("show");
+    if (isOpen) return;
+    var rect = triggerEl.getBoundingClientRect();
+    var panelWidth = Math.max(rect.width, 190);
+    var left = Math.min(rect.left, window.innerWidth - panelWidth - 8);
+    panel.style.left = Math.max(left, 8) + "px";
+    panel.style.top = (rect.bottom + 4) + "px";
+    panel.style.minWidth = rect.width + "px";
+    panel.classList.add("show");
   }
 
   function populateFilterOptions() {
@@ -1363,12 +1369,14 @@
 
     $("msNaturezaTrigger").addEventListener("click", function (e) {
       e.stopPropagation();
-      toggleMsPanel("msNaturezaPanel");
+      toggleMsPanel("msNaturezaPanel", e.currentTarget);
     });
     $("msStatusTrigger").addEventListener("click", function (e) {
       e.stopPropagation();
-      toggleMsPanel("msStatusPanel");
+      toggleMsPanel("msStatusPanel", e.currentTarget);
     });
+    window.addEventListener("scroll", closeAllMsPanels, true);
+    window.addEventListener("resize", closeAllMsPanels);
 
     $("msNaturezaPanel").addEventListener("click", function (e) { e.stopPropagation(); });
     $("msNaturezaPanel").addEventListener("change", function (e) {
