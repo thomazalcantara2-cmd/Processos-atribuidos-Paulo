@@ -595,6 +595,20 @@
           </th>
           <th data-sort="dataRetorno">
             <div class="th-label">Data do retorno</div>
+            <div class="ms-filter" id="msRetorno">
+              <button type="button" class="th-filter ms-trigger" id="msRetornoTrigger">Todas</button>
+              <div class="ms-panel date-panel" id="msRetornoPanel">
+                <div class="date-filter-row">
+                  <label for="filterRetornoDe">De</label>
+                  <input type="date" id="filterRetornoDe">
+                </div>
+                <div class="date-filter-row">
+                  <label for="filterRetornoAte">Até</label>
+                  <input type="date" id="filterRetornoAte">
+                </div>
+                <button type="button" class="link-btn" id="btnClearRetornoFilter">Limpar</button>
+              </div>
+            </div>
           </th>
           <th data-sort="elaborarVoto">
             <div class="th-label">Elaborar o voto</div>
@@ -794,7 +808,9 @@
     filterNatureza: [],
     filterStatus: [],
     filterDistDe: "",
-    filterDistAte: ""
+    filterDistAte: "",
+    filterRetornoDe: "",
+    filterRetornoAte: ""
   };
 
   function $(id) { return document.getElementById(id); }
@@ -1055,13 +1071,12 @@
     renderMultiSelectPanel("msNaturezaPanel", naturezas, state.filterNatureza);
     updateMsTrigger("msNaturezaTrigger", state.filterNatureza, "Todas");
 
-    updateDistribuicaoTrigger();
+    updateDateRangeTrigger("msDistribuicaoTrigger", state.filterDistDe, state.filterDistAte);
+    updateDateRangeTrigger("msRetornoTrigger", state.filterRetornoDe, state.filterRetornoAte);
   }
 
-  function updateDistribuicaoTrigger() {
-    var trigger = $("msDistribuicaoTrigger");
-    var de = state.filterDistDe;
-    var ate = state.filterDistAte;
+  function updateDateRangeTrigger(triggerId, de, ate) {
+    var trigger = $(triggerId);
     if (!de && !ate) {
       trigger.textContent = "Todas";
     } else if (de && ate && de === ate) {
@@ -1097,6 +1112,8 @@
       if (assunto && (r.assunto || "").toLowerCase().indexOf(assunto) === -1) return false;
       if (state.filterDistDe && (r.distribuicao || "") < state.filterDistDe) return false;
       if (state.filterDistAte && (r.distribuicao || "") > state.filterDistAte) return false;
+      if (state.filterRetornoDe && (r.dataRetorno || "") < state.filterRetornoDe) return false;
+      if (state.filterRetornoAte && (r.dataRetorno || "") > state.filterRetornoAte) return false;
       return true;
     });
 
@@ -1456,10 +1473,14 @@
       $("filterElaborarVoto").value = "";
       $("filterDistDe").value = "";
       $("filterDistAte").value = "";
+      $("filterRetornoDe").value = "";
+      $("filterRetornoAte").value = "";
       state.filterNatureza = [];
       state.filterStatus = [];
       state.filterDistDe = "";
       state.filterDistAte = "";
+      state.filterRetornoDe = "";
+      state.filterRetornoAte = "";
       populateFilterOptions();
       renderTable();
     });
@@ -1483,12 +1504,12 @@
     $("msDistribuicaoPanel").addEventListener("click", function (e) { e.stopPropagation(); });
     $("filterDistDe").addEventListener("change", function () {
       state.filterDistDe = this.value;
-      updateDistribuicaoTrigger();
+      updateDateRangeTrigger("msDistribuicaoTrigger", state.filterDistDe, state.filterDistAte);
       renderTable();
     });
     $("filterDistAte").addEventListener("change", function () {
       state.filterDistAte = this.value;
-      updateDistribuicaoTrigger();
+      updateDateRangeTrigger("msDistribuicaoTrigger", state.filterDistDe, state.filterDistAte);
       renderTable();
     });
     $("btnClearDistFilter").addEventListener("click", function (e) {
@@ -1497,7 +1518,32 @@
       state.filterDistAte = "";
       $("filterDistDe").value = "";
       $("filterDistAte").value = "";
-      updateDistribuicaoTrigger();
+      updateDateRangeTrigger("msDistribuicaoTrigger", "", "");
+      renderTable();
+    });
+
+    $("msRetornoTrigger").addEventListener("click", function (e) {
+      e.stopPropagation();
+      toggleMsPanel("msRetornoPanel", e.currentTarget);
+    });
+    $("msRetornoPanel").addEventListener("click", function (e) { e.stopPropagation(); });
+    $("filterRetornoDe").addEventListener("change", function () {
+      state.filterRetornoDe = this.value;
+      updateDateRangeTrigger("msRetornoTrigger", state.filterRetornoDe, state.filterRetornoAte);
+      renderTable();
+    });
+    $("filterRetornoAte").addEventListener("change", function () {
+      state.filterRetornoAte = this.value;
+      updateDateRangeTrigger("msRetornoTrigger", state.filterRetornoDe, state.filterRetornoAte);
+      renderTable();
+    });
+    $("btnClearRetornoFilter").addEventListener("click", function (e) {
+      e.stopPropagation();
+      state.filterRetornoDe = "";
+      state.filterRetornoAte = "";
+      $("filterRetornoDe").value = "";
+      $("filterRetornoAte").value = "";
+      updateDateRangeTrigger("msRetornoTrigger", "", "");
       renderTable();
     });
     window.addEventListener("scroll", closeAllMsPanels, true);
