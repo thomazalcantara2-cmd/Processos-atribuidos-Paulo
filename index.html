@@ -664,12 +664,7 @@
               <option>A SER ELABORADO</option>
               <option>EM ELABORAÇÃO</option>
               <option>ENCAMINHADA PARA CORREÇÃO</option>
-              <option>ENCAMINHADA PARA ASSINATURA</option>
-              <option>ENCAMINHADA PARA CORREÇÃO + Minuta CORRIGIR</option>
-              <option>Minuta Pronta- Aguardando Fechamento de Pauta</option>
-              <option>Minuta PRONTA - apto para inclusão em pauta</option>
-              <option>Minuta PRONTA - aguardando julgamento</option>
-              <option>ASSINADA</option>
+              <option>PRONTA</option>
             </select>
           </div>
           <div class="field">
@@ -779,12 +774,7 @@
     "A SER ELABORADO": "#64748b",
     "EM ELABORAÇÃO": "#2563eb",
     "ENCAMINHADA PARA CORREÇÃO": "#eab308",
-    "ENCAMINHADA PARA ASSINATURA": "#7c3aed",
-    "ENCAMINHADA PARA CORREÇÃO + Minuta CORRIGIR": "#2563eb",
-    "Minuta Pronta- Aguardando Fechamento de Pauta": "#0d9488",
-    "Minuta PRONTA - apto para inclusão em pauta": "#059669",
-    "Minuta PRONTA - aguardando julgamento": "#4338ca",
-    "ASSINADA": "#16a34a"
+    "PRONTA": "#16a34a"
   };
 
   var NATUREZA_COLORS = {
@@ -1003,15 +993,15 @@
     state.records.forEach(function (r) {
       counts[r.status] = (counts[r.status] || 0) + 1;
     });
-    var assinadas = counts["ASSINADA"] || 0;
+    var prontas = counts["PRONTA"] || 0;
     var emElaboracao = (counts["EM ELABORAÇÃO"] || 0) + (counts["A SER ELABORADO"] || 0);
-    var paraCorrigir = (counts["ENCAMINHADA PARA CORREÇÃO"] || 0) + (counts["ENCAMINHADA PARA CORREÇÃO + Minuta CORRIGIR"] || 0);
+    var paraCorrigir = counts["ENCAMINHADA PARA CORREÇÃO"] || 0;
 
     var cards = [
       { label: "Total de processos", num: total, icon: ICONS.folder, pill: null },
       { label: "Em elaboração", num: emElaboracao, icon: ICONS.clock, pill: { text: emElaboracao + " ativos", type: "neutral" }, iconBg: "#eab308" },
       { label: "Para correção", num: paraCorrigir, icon: ICONS.alert, pill: paraCorrigir > 0 ? { text: "atenção", type: "bad" } : { text: "em dia", type: "good" }, iconBg: "#dc2626" },
-      { label: "Assinadas", num: assinadas, icon: ICONS.check, pill: { text: "concluído", type: "good" }, iconBg: "#16a34a" }
+      { label: "Prontas", num: prontas, icon: ICONS.check, pill: { text: "concluído", type: "good" }, iconBg: "#16a34a" }
     ];
 
     $("summaryRow").innerHTML = cards.map(function (c) {

@@ -4,7 +4,7 @@ Página em formato de tabela para controle de processos, com os campos:
 
 1. **Natureza** (AI, RemNecCiv, ApCiv, ApelRemNec)
 2. **Nº Processo**
-3. **Status** (fluxo de elaboração até assinatura)
+3. **Status** (A SER ELABORADO / EM ELABORAÇÃO / ENCAMINHADA PARA CORREÇÃO / PRONTA)
 4. **Distribuição** (data)
 5. **Assunto** (lista pré-definida, com opção de acrescentar novos)
 6. **Data do retorno**
