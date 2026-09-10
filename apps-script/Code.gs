@@ -8,7 +8,7 @@
 var SHEET_NAME = 'Processos';
 var HEADERS = [
   'ID', 'Natureza', 'NumeroProcesso', 'Status', 'Distribuicao',
-  'Assunto', 'DataRetorno', 'ElaborarVoto', 'CriadoEm', 'AtualizadoEm'
+  'Assunto', 'CriadoEm', 'AtualizadoEm'
 ];
 
 function getSheet_() {
@@ -67,8 +67,6 @@ function doPost(e) {
         record.Status || '',
         record.Distribuicao || '',
         record.Assunto || '',
-        record.DataRetorno || '',
-        record.ElaborarVoto || '',
         now,
         now
       ]);
@@ -80,16 +78,14 @@ function doPost(e) {
       var updRecord = body.record || {};
       var rowIndex = findRowById_(sheet, updId);
       if (rowIndex === -1) return jsonResponse_({ ok: false, error: 'Registro não encontrado' });
-      sheet.getRange(rowIndex, 2, 1, 7).setValues([[
+      sheet.getRange(rowIndex, 2, 1, 5).setValues([[
         updRecord.Natureza || '',
         updRecord.NumeroProcesso || '',
         updRecord.Status || '',
         updRecord.Distribuicao || '',
-        updRecord.Assunto || '',
-        updRecord.DataRetorno || '',
-        updRecord.ElaborarVoto || ''
+        updRecord.Assunto || ''
       ]]);
-      sheet.getRange(rowIndex, 10).setValue(new Date().toISOString());
+      sheet.getRange(rowIndex, 8).setValue(new Date().toISOString());
       return jsonResponse_({ ok: true });
     }
 

@@ -593,37 +593,11 @@
             <div class="th-label">Assunto</div>
             <input type="text" class="th-filter" id="filterAssunto" placeholder="Buscar...">
           </th>
-          <th data-sort="dataRetorno">
-            <div class="th-label">Data do retorno</div>
-            <div class="ms-filter" id="msRetorno">
-              <button type="button" class="th-filter ms-trigger" id="msRetornoTrigger">Todas</button>
-              <div class="ms-panel date-panel" id="msRetornoPanel">
-                <div class="date-filter-row">
-                  <label for="filterRetornoDe">De</label>
-                  <input type="date" id="filterRetornoDe">
-                </div>
-                <div class="date-filter-row">
-                  <label for="filterRetornoAte">Até</label>
-                  <input type="date" id="filterRetornoAte">
-                </div>
-                <button type="button" class="link-btn" id="btnClearRetornoFilter">Limpar</button>
-              </div>
-            </div>
-          </th>
-          <th data-sort="elaborarVoto">
-            <div class="th-label">Elaborar o voto</div>
-            <select class="th-filter" id="filterElaborarVoto">
-              <option value="">Todos</option>
-              <option>A SER ELABORADO</option>
-              <option>EM ELABORAÇÃO</option>
-              <option>ELABORADO</option>
-            </select>
-          </th>
           <th class="col-actions"><div class="th-label" style="cursor:default">Ações</div></th>
         </tr>
       </thead>
       <tbody id="tableBody">
-        <tr class="empty-row"><td colspan="8">Carregando...</td></tr>
+        <tr class="empty-row"><td colspan="6">Carregando...</td></tr>
       </tbody>
     </table>
   </div>
@@ -647,7 +621,8 @@
             <label for="fNatureza">1 — Natureza</label>
             <select id="fNatureza" required>
               <option value="">Selecione...</option>
-              <option value="AI">AI</option>
+              <option value="AI- Liminar">AI- Liminar</option>
+              <option value="AI- Voto">AI- Voto</option>
               <option value="RemNecCiv">RemNecCiv</option>
               <option value="ApCiv">ApCiv</option>
               <option value="ApelRemNec">ApelRemNec</option>
@@ -662,18 +637,13 @@
             <select id="fStatus" required>
               <option value="">Selecione...</option>
               <option>A SER ELABORADO</option>
-              <option>EM ELABORAÇÃO</option>
               <option>ENCAMINHADA PARA CORREÇÃO</option>
               <option>PRONTA</option>
             </select>
           </div>
-          <div class="field">
+          <div class="field full">
             <label for="fDistribuicao">4 — Distribuição</label>
             <input type="date" id="fDistribuicao">
-          </div>
-          <div class="field">
-            <label for="fDataRetorno">6 — Data do retorno</label>
-            <input type="date" id="fDataRetorno">
           </div>
           <div class="field full">
             <label for="fAssuntoInput">5 — Assunto</label>
@@ -687,15 +657,6 @@
               <input type="text" id="fNewAssunto" placeholder="Digite o novo assunto...">
               <button type="button" class="btn btn-secondary btn-small" id="btnAddAssunto">Adicionar</button>
             </div>
-          </div>
-          <div class="field full">
-            <label for="fElaborarVoto">7 — Elaborar o voto</label>
-            <select id="fElaborarVoto" required>
-              <option value="">Selecione...</option>
-              <option>A SER ELABORADO</option>
-              <option>EM ELABORAÇÃO</option>
-              <option>ELABORADO</option>
-            </select>
           </div>
         </div>
       </form>
@@ -772,22 +733,16 @@
 
   var STATUS_COLORS = {
     "A SER ELABORADO": "#64748b",
-    "EM ELABORAÇÃO": "#2563eb",
     "ENCAMINHADA PARA CORREÇÃO": "#eab308",
     "PRONTA": "#16a34a"
   };
 
   var NATUREZA_COLORS = {
-    "AI": "#2563eb",
+    "AI- Liminar": "#2563eb",
+    "AI- Voto": "#db2777",
     "RemNecCiv": "#7c3aed",
     "ApCiv": "#0d9488",
     "ApelRemNec": "#ea580c"
-  };
-
-  var ELABORAR_VOTO_COLORS = {
-    "A SER ELABORADO": "#dc2626",
-    "EM ELABORAÇÃO": "#eab308",
-    "ELABORADO": "#16a34a"
   };
 
   var state = {
@@ -798,9 +753,7 @@
     filterNatureza: [],
     filterStatus: [],
     filterDistDe: "",
-    filterDistAte: "",
-    filterRetornoDe: "",
-    filterRetornoAte: ""
+    filterDistAte: ""
   };
 
   function $(id) { return document.getElementById(id); }
@@ -895,9 +848,7 @@
       numeroProcesso: row.NumeroProcesso || "",
       status: row.Status || "",
       distribuicao: row.Distribuicao || "",
-      assunto: row.Assunto || "",
-      dataRetorno: row.DataRetorno || "",
-      elaborarVoto: row.ElaborarVoto || ""
+      assunto: row.Assunto || ""
     };
   }
 
@@ -907,9 +858,7 @@
       NumeroProcesso: record.numeroProcesso,
       Status: record.status,
       Distribuicao: record.distribuicao,
-      Assunto: record.assunto,
-      DataRetorno: record.dataRetorno,
-      ElaborarVoto: record.elaborarVoto
+      Assunto: record.assunto
     };
   }
 
@@ -994,12 +943,12 @@
       counts[r.status] = (counts[r.status] || 0) + 1;
     });
     var prontas = counts["PRONTA"] || 0;
-    var emElaboracao = (counts["EM ELABORAÇÃO"] || 0) + (counts["A SER ELABORADO"] || 0);
+    var aSerElaborado = counts["A SER ELABORADO"] || 0;
     var paraCorrigir = counts["ENCAMINHADA PARA CORREÇÃO"] || 0;
 
     var cards = [
       { label: "Total de processos", num: total, icon: ICONS.folder, pill: null },
-      { label: "Em elaboração", num: emElaboracao, icon: ICONS.clock, pill: { text: emElaboracao + " ativos", type: "neutral" }, iconBg: "#eab308" },
+      { label: "A ser elaborado", num: aSerElaborado, icon: ICONS.clock, pill: { text: aSerElaborado + " ativos", type: "neutral" }, iconBg: "#eab308" },
       { label: "Para correção", num: paraCorrigir, icon: ICONS.alert, pill: paraCorrigir > 0 ? { text: "atenção", type: "bad" } : { text: "em dia", type: "good" }, iconBg: "#dc2626" },
       { label: "Prontas", num: prontas, icon: ICONS.check, pill: { text: "concluído", type: "good" }, iconBg: "#16a34a" }
     ];
@@ -1057,12 +1006,11 @@
     renderMultiSelectPanel("msStatusPanel", statuses, state.filterStatus);
     updateMsTrigger("msStatusTrigger", state.filterStatus, "Todos");
 
-    var naturezas = ["AI", "RemNecCiv", "ApCiv", "ApelRemNec"];
+    var naturezas = ["AI- Liminar", "AI- Voto", "RemNecCiv", "ApCiv", "ApelRemNec"];
     renderMultiSelectPanel("msNaturezaPanel", naturezas, state.filterNatureza);
     updateMsTrigger("msNaturezaTrigger", state.filterNatureza, "Todas");
 
     updateDateRangeTrigger("msDistribuicaoTrigger", state.filterDistDe, state.filterDistAte);
-    updateDateRangeTrigger("msRetornoTrigger", state.filterRetornoDe, state.filterRetornoAte);
   }
 
   function updateDateRangeTrigger(triggerId, de, ate) {
@@ -1092,18 +1040,14 @@
     var assunto = $("filterAssunto").value.trim().toLowerCase();
     var natureza = state.filterNatureza;
     var status = state.filterStatus;
-    var elaborarVoto = $("filterElaborarVoto").value;
 
     var filtered = state.records.filter(function (r) {
       if (natureza.length && natureza.indexOf(r.natureza) === -1) return false;
       if (status.length && status.indexOf(r.status) === -1) return false;
-      if (elaborarVoto && r.elaborarVoto !== elaborarVoto) return false;
       if (numero && (r.numeroProcesso || "").toLowerCase().indexOf(numero) === -1) return false;
       if (assunto && (r.assunto || "").toLowerCase().indexOf(assunto) === -1) return false;
       if (state.filterDistDe && (r.distribuicao || "") < state.filterDistDe) return false;
       if (state.filterDistAte && (r.distribuicao || "") > state.filterDistAte) return false;
-      if (state.filterRetornoDe && (r.dataRetorno || "") < state.filterRetornoDe) return false;
-      if (state.filterRetornoAte && (r.dataRetorno || "") > state.filterRetornoAte) return false;
       return true;
     });
 
@@ -1125,16 +1069,14 @@
     var body = $("tableBody");
 
     if (records.length === 0) {
-      body.innerHTML = '<tr class="empty-row"><td colspan="8">Nenhum processo cadastrado. Clique em "+ Novo processo" para começar.</td></tr>';
+      body.innerHTML = '<tr class="empty-row"><td colspan="6">Nenhum processo cadastrado. Clique em "+ Novo processo" para começar.</td></tr>';
       return;
     }
 
     body.innerHTML = records.map(function (r) {
       var statusColor = STATUS_COLORS[r.status] || "#475569";
       var naturezaColor = NATUREZA_COLORS[r.natureza] || "#64748b";
-      var votoColor = ELABORAR_VOTO_COLORS[r.elaborarVoto] || "#64748b";
       var naturezaDot = '<span class="type-dot" style="background:' + naturezaColor + '"></span>';
-      var votoDot = r.elaborarVoto ? '<span class="type-dot" style="background:' + votoColor + '"></span>' : "";
       return (
         '<tr>' +
         '<td>' + formatDate(r.distribuicao) + '</td>' +
@@ -1142,8 +1084,6 @@
         '<td>' + escapeHtml(r.numeroProcesso) + '</td>' +
         '<td><span class="type-text status-text" style="color:' + statusColor + '">' + escapeHtml(r.status) + '</span></td>' +
         '<td>' + escapeHtml(r.assunto) + '</td>' +
-        '<td>' + formatDate(r.dataRetorno) + '</td>' +
-        '<td><span class="type-text">' + votoDot + escapeHtml(r.elaborarVoto) + '</span></td>' +
         '<td><div class="row-actions">' +
         '<button class="icon-btn" title="Editar" data-action="edit" data-id="' + escapeHtml(r.id) + '">' + ICONS.edit + '</button>' +
         '<button class="icon-btn danger" title="Excluir" data-action="delete" data-id="' + escapeHtml(r.id) + '">' + ICONS.trash + '</button>' +
@@ -1175,7 +1115,7 @@
   }
 
   function refresh() {
-    $("tableBody").innerHTML = '<tr class="empty-row"><td colspan="8">Carregando...</td></tr>';
+    $("tableBody").innerHTML = '<tr class="empty-row"><td colspan="6">Carregando...</td></tr>';
     apiList().then(function (records) {
       state.records = records;
       renderAll();
@@ -1228,8 +1168,6 @@
     $("fNumeroProcesso").value = record ? record.numeroProcesso : "";
     $("fStatus").value = record ? record.status : "";
     $("fDistribuicao").value = record ? (record.distribuicao || "").slice(0, 10) : "";
-    $("fDataRetorno").value = record ? (record.dataRetorno || "").slice(0, 10) : "";
-    $("fElaborarVoto").value = record ? record.elaborarVoto : "";
     populateAssuntoCombo(record ? record.assunto : "");
     $("newAssuntoRow").classList.add("hidden");
     $("fNewAssunto").value = "";
@@ -1247,9 +1185,7 @@
       numeroProcesso: $("fNumeroProcesso").value.trim(),
       status: $("fStatus").value,
       distribuicao: $("fDistribuicao").value,
-      assunto: $("fAssunto").value,
-      dataRetorno: $("fDataRetorno").value,
-      elaborarVoto: $("fElaborarVoto").value
+      assunto: $("fAssunto").value
     };
   }
 
@@ -1258,7 +1194,6 @@
     if (!record.numeroProcesso) return "Informe o Nº do processo.";
     if (!record.status) return "Selecione o Status.";
     if (!record.assunto) return "Selecione o Assunto.";
-    if (!record.elaborarVoto) return "Selecione a situação do voto.";
     return null;
   }
 
@@ -1319,13 +1254,12 @@
 
   function exportCsv() {
     var records = getFilteredSortedRecords();
-    var headers = ["Natureza", "Nº Processo", "Status", "Distribuição", "Assunto", "Data do retorno", "Elaborar o voto"];
+    var headers = ["Natureza", "Nº Processo", "Status", "Distribuição", "Assunto"];
     var lines = [headers.join(";")];
     records.forEach(function (r) {
       lines.push([
         r.natureza, r.numeroProcesso, r.status,
-        formatDate(r.distribuicao), r.assunto,
-        formatDate(r.dataRetorno), r.elaborarVoto
+        formatDate(r.distribuicao), r.assunto
       ].map(function (v) {
         var s = String(v || "").replace(/"/g, '""');
         return '"' + s + '"';
@@ -1397,9 +1331,7 @@
         numeroProcesso: (row[1] || "").trim(),
         status: (row[2] || "").trim(),
         distribuicao: parseBrDate(row[3]),
-        assunto: (row[4] || "").trim(),
-        dataRetorno: parseBrDate(row[5]),
-        elaborarVoto: (row[6] || "").trim()
+        assunto: (row[4] || "").trim()
       };
       if (!record.numeroProcesso) {
         skippedLines.push(i + 2);
@@ -1460,24 +1392,18 @@
     $("btnClearFilters").addEventListener("click", function () {
       $("filterNumero").value = "";
       $("filterAssunto").value = "";
-      $("filterElaborarVoto").value = "";
       $("filterDistDe").value = "";
       $("filterDistAte").value = "";
-      $("filterRetornoDe").value = "";
-      $("filterRetornoAte").value = "";
       state.filterNatureza = [];
       state.filterStatus = [];
       state.filterDistDe = "";
       state.filterDistAte = "";
-      state.filterRetornoDe = "";
-      state.filterRetornoAte = "";
       populateFilterOptions();
       renderTable();
     });
 
     $("filterNumero").addEventListener("input", renderTable);
     $("filterAssunto").addEventListener("input", renderTable);
-    $("filterElaborarVoto").addEventListener("change", renderTable);
 
     $("msNaturezaTrigger").addEventListener("click", function (e) {
       e.stopPropagation();
@@ -1512,30 +1438,6 @@
       renderTable();
     });
 
-    $("msRetornoTrigger").addEventListener("click", function (e) {
-      e.stopPropagation();
-      toggleMsPanel("msRetornoPanel", e.currentTarget);
-    });
-    $("msRetornoPanel").addEventListener("click", function (e) { e.stopPropagation(); });
-    $("filterRetornoDe").addEventListener("change", function () {
-      state.filterRetornoDe = this.value;
-      updateDateRangeTrigger("msRetornoTrigger", state.filterRetornoDe, state.filterRetornoAte);
-      renderTable();
-    });
-    $("filterRetornoAte").addEventListener("change", function () {
-      state.filterRetornoAte = this.value;
-      updateDateRangeTrigger("msRetornoTrigger", state.filterRetornoDe, state.filterRetornoAte);
-      renderTable();
-    });
-    $("btnClearRetornoFilter").addEventListener("click", function (e) {
-      e.stopPropagation();
-      state.filterRetornoDe = "";
-      state.filterRetornoAte = "";
-      $("filterRetornoDe").value = "";
-      $("filterRetornoAte").value = "";
-      updateDateRangeTrigger("msRetornoTrigger", "", "");
-      renderTable();
-    });
     window.addEventListener("scroll", closeAllMsPanels, true);
     window.addEventListener("resize", closeAllMsPanels);
 

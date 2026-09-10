@@ -2,13 +2,11 @@
 
 Página em formato de tabela para controle de processos, com os campos:
 
-1. **Natureza** (AI, RemNecCiv, ApCiv, ApelRemNec)
+1. **Natureza** (AI- Liminar, AI- Voto, RemNecCiv, ApCiv, ApelRemNec)
 2. **Nº Processo**
-3. **Status** (A SER ELABORADO / EM ELABORAÇÃO / ENCAMINHADA PARA CORREÇÃO / PRONTA)
+3. **Status** (A SER ELABORADO / ENCAMINHADA PARA CORREÇÃO / PRONTA)
 4. **Distribuição** (data)
 5. **Assunto** (lista pré-definida, com opção de acrescentar novos)
-6. **Data do retorno**
-7. **Elaborar o voto** (A SER ELABORADO / EM ELABORAÇÃO / ELABORADO)
 
 Os dados são salvos em uma **planilha do Google Sheets**, usada como banco de dados. A comunicação entre a página e a planilha é feita por um script publicado no **Google Apps Script**.
 
@@ -49,6 +47,10 @@ A partir daí, a aba **Processos** da planilha funciona como banco de dados: cad
 
 Se a URL do Apps Script ainda não foi configurada, a página funciona normalmente salvando os dados no navegador (`localStorage`). Isso é útil para testar a página antes de concluir a integração — mas os dados não ficam salvos entre navegadores/computadores diferentes. Assim que a integração for configurada, os novos registros passam a ser gravados na planilha.
 
+### Se você já tinha publicado o Apps Script antes
+
+Os campos "Data do retorno" e "Elaborar o voto" foram removidos da página. Se você já publicou uma implantação do `apps-script/Code.gs` anteriormente, copie o conteúdo atualizado do arquivo para o editor do Apps Script e publique uma **nova versão** da implantação (Implantar > Gerenciar implantações > editar > Nova versão) para manter a gravação de registros funcionando corretamente. As colunas antigas na planilha não são apagadas, só deixam de ser usadas.
+
 ## Hospedando a página (opcional)
 
 Para acessar a página de qualquer lugar (não só do computador local), é possível publicar este repositório com o **GitHub Pages**:
@@ -62,7 +64,7 @@ Para acessar a página de qualquer lugar (não só do computador local), é poss
 - Cadastro, edição e exclusão de processos.
 - Filtro por texto (nº do processo/assunto), por natureza e por status.
 - Ordenação por qualquer coluna (clique no cabeçalho).
-- Contadores resumo (total, em elaboração, para correção, assinadas).
+- Contadores resumo (total, a ser elaborado, para correção, prontas).
 - Exportação da lista filtrada em CSV.
-- Importação em massa via CSV (botão "Importar CSV" no topo): cadastra vários processos de uma vez, no mesmo formato gerado pela exportação (colunas Natureza;Nº Processo;Status;Distribuição;Assunto;Data do retorno;Elaborar o voto, separadas por `;`, datas em `dd/mm/aaaa`). Útil para trazer dados de uma planilha antiga sem digitar processo por processo.
+- Importação em massa via CSV (botão "Importar CSV" no topo): cadastra vários processos de uma vez, no mesmo formato gerado pela exportação (colunas Natureza;Nº Processo;Status;Distribuição;Assunto, separadas por `;`, datas em `dd/mm/aaaa`). Útil para trazer dados de uma planilha antiga sem digitar processo por processo.
 - Lista de assuntos pré-cadastrada, com opção de acrescentar novos assuntos pelo próprio formulário.
