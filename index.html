@@ -546,6 +546,7 @@
   <div class="summary-row" id="summaryRow"></div>
 
   <div class="toolbar">
+    <button class="btn btn-secondary btn-small" id="btnBulkEdit" type="button">Editar em massa</button>
     <button class="btn btn-secondary btn-small" id="btnClearFilters" type="button">Limpar filtros</button>
     <button class="btn btn-secondary btn-small" id="btnRefresh" type="button">↻ Atualizar</button>
   </div>
@@ -690,6 +691,44 @@
     <div class="modal-footer">
       <button class="btn btn-secondary" id="btnClearUrl" type="button">Remover integração</button>
       <button class="btn btn-primary" id="btnSaveUrl" type="button">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: edição em massa -->
+<div class="modal-overlay" id="bulkEditModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Editar em massa</h2>
+      <button class="modal-close" id="bulkEditModalClose" type="button">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.82rem; color:var(--text-muted); margin:0 0 14px; line-height:1.5;">
+        A alteração é aplicada apenas aos processos que estão sendo exibidos com os filtros
+        atuais da tabela (use os filtros do cabeçalho, como Distribuição, para restringir antes de aplicar).
+      </p>
+      <div class="form-grid">
+        <div class="field full">
+          <label for="bulkField">Coluna a alterar</label>
+          <select id="bulkField">
+            <option value="natureza">Natureza</option>
+            <option value="status">Status</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="bulkCurrentValue">Somente onde o valor atual for (opcional)</label>
+          <input type="text" id="bulkCurrentValue" placeholder="Deixe em branco para aplicar a todos os filtrados">
+        </div>
+        <div class="field full">
+          <label for="bulkNewValue">Novo valor</label>
+          <select id="bulkNewValue"></select>
+        </div>
+      </div>
+      <p style="font-size:0.82rem; color:var(--text); margin:14px 0 0; font-weight:600;" id="bulkAffectedCount"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btnCancelBulkEdit" type="button">Cancelar</button>
+      <button class="btn btn-primary" id="btnApplyBulkEdit" type="button">Aplicar</button>
     </div>
   </div>
 </div>
@@ -1006,7 +1045,7 @@
     renderMultiSelectPanel("msStatusPanel", statuses, state.filterStatus);
     updateMsTrigger("msStatusTrigger", state.filterStatus, "Todos");
 
-    var naturezas = ["AI- Liminar", "AI- Voto", "RemNecCiv", "ApCiv", "ApelRemNec"];
+    var naturezas = Object.keys(NATUREZA_COLORS);
     renderMultiSelectPanel("msNaturezaPanel", naturezas, state.filterNatureza);
     updateMsTrigger("msNaturezaTrigger", state.filterNatureza, "Todas");
 
@@ -1248,6 +1287,84 @@
     $("scriptUrlInput").value = "";
     closeSettingsModal();
     refresh();
+  }
+
+  // ---------- Edição em massa ----------
+
+  function getFieldOptionsFor(field) {
+    return field === "status" ? Object.keys(STATUS_COLORS) : Object.keys(NATUREZA_COLORS);
+  }
+
+  function populateBulkNewValueSelect() {
+    var options = getFieldOptionsFor($("bulkField").value);
+    $("bulkNewValue").innerHTML = options.map(function (o) {
+      return '<option value="' + escapeHtml(o) + '">' + escapeHtml(o) + '</option>';
+    }).join("");
+  }
+
+  function getBulkCandidates() {
+    var field = $("bulkField").value;
+    var currentValue = $("bulkCurrentValue").value.trim();
+    var base = getFilteredSortedRecords();
+    if (!currentValue) return base;
+    return base.filter(function (r) { return (r[field] || "") === currentValue; });
+  }
+
+  function updateBulkAffectedCount() {
+    var count = getBulkCandidates().length;
+    $("bulkAffectedCount").textContent = count === 0
+      ? "Nenhum processo corresponde a esses critérios."
+      : count + " processo(s) serão alterados.";
+  }
+
+  function openBulkEditModal() {
+    $("bulkField").value = "natureza";
+    $("bulkCurrentValue").value = "";
+    populateBulkNewValueSelect();
+    updateBulkAffectedCount();
+    $("bulkEditModalOverlay").classList.add("show");
+  }
+
+  function closeBulkEditModal() {
+    $("bulkEditModalOverlay").classList.remove("show");
+  }
+
+  function applyBulkEdit() {
+    var field = $("bulkField").value;
+    var newValue = $("bulkNewValue").value;
+    var candidates = getBulkCandidates();
+    if (candidates.length === 0) {
+      alert("Nenhum processo corresponde a esses critérios.");
+      return;
+    }
+    var fieldLabel = field === "status" ? "Status" : "Natureza";
+    var confirmed = confirm(
+      "Alterar " + fieldLabel + " de " + candidates.length + ' processo(s) para "' + newValue + '"? ' +
+      "Essa ação não pode ser desfeita automaticamente."
+    );
+    if (!confirmed) return;
+
+    var btn = $("btnApplyBulkEdit");
+    btn.disabled = true;
+    btn.textContent = "Aplicando...";
+
+    function next(i) {
+      if (i >= candidates.length) return Promise.resolve();
+      var record = Object.assign({}, candidates[i]);
+      record[field] = newValue;
+      return updateRecord(record).then(function () { return next(i + 1); });
+    }
+
+    next(0).then(function () {
+      closeBulkEditModal();
+      showBanner(candidates.length + " processo(s) atualizado(s).", false);
+      refresh();
+    }).catch(function (err) {
+      alert("Erro ao aplicar edição em massa: " + err.message);
+    }).finally(function () {
+      btn.disabled = false;
+      btn.textContent = "Aplicar";
+    });
   }
 
   // ---------- CSV export ----------
@@ -1542,6 +1659,19 @@
     $("btnClearUrl").addEventListener("click", clearSettings);
     $("settingsModalOverlay").addEventListener("click", function (e) {
       if (e.target === $("settingsModalOverlay")) closeSettingsModal();
+    });
+
+    $("btnBulkEdit").addEventListener("click", openBulkEditModal);
+    $("bulkEditModalClose").addEventListener("click", closeBulkEditModal);
+    $("btnCancelBulkEdit").addEventListener("click", closeBulkEditModal);
+    $("btnApplyBulkEdit").addEventListener("click", applyBulkEdit);
+    $("bulkField").addEventListener("change", function () {
+      populateBulkNewValueSelect();
+      updateBulkAffectedCount();
+    });
+    $("bulkCurrentValue").addEventListener("input", updateBulkAffectedCount);
+    $("bulkEditModalOverlay").addEventListener("click", function (e) {
+      if (e.target === $("bulkEditModalOverlay")) closeBulkEditModal();
     });
   }
 
