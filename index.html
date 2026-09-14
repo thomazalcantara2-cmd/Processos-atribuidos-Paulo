@@ -771,7 +771,7 @@
   ];
 
   var STATUS_COLORS = {
-    "A SER ELABORADO": "#64748b",
+    "A SER ELABORADO": "#dc2626",
     "ENCAMINHADA PARA CORREÇÃO": "#eab308",
     "PRONTA": "#16a34a"
   };
@@ -987,8 +987,8 @@
 
     var cards = [
       { label: "Total de processos", num: total, icon: ICONS.folder, pill: null },
-      { label: "A ser elaborado", num: aSerElaborado, icon: ICONS.clock, pill: { text: aSerElaborado + " ativos", type: "neutral" }, iconBg: "#eab308" },
-      { label: "Para correção", num: paraCorrigir, icon: ICONS.alert, pill: paraCorrigir > 0 ? { text: "atenção", type: "bad" } : { text: "em dia", type: "good" }, iconBg: "#dc2626" },
+      { label: "A ser elaborado", num: aSerElaborado, icon: ICONS.clock, pill: { text: aSerElaborado + " ativos", type: "neutral" }, iconBg: "#dc2626" },
+      { label: "Para correção", num: paraCorrigir, icon: ICONS.alert, pill: paraCorrigir > 0 ? { text: "atenção", type: "bad" } : { text: "em dia", type: "good" }, iconBg: "#eab308" },
       { label: "Prontas", num: prontas, icon: ICONS.check, pill: { text: "concluído", type: "good" }, iconBg: "#16a34a" }
     ];
 
